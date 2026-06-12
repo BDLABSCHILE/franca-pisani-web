@@ -1,46 +1,80 @@
-const PILLARS = [
+import type { ComponentType } from "react";
+import {
+  BoltIcon,
+  ConfigureIcon,
+  PencilIcon,
+  QuoteIcon,
+} from "@/components/icons";
+
+/**
+ * Los 4 pilares de la propuesta RPC: cotización online, preview del logo,
+ * stock express y fabricación propia. Copy sin cifras inventadas — solo los
+ * claims permitidos (40+ años, modelo dual).
+ */
+const PILLARS: readonly {
+  icon: ComponentType<{ className?: string }>;
+  title: string;
+  body: string;
+}[] = [
   {
-    n: "01",
-    title: "Cotización instantánea",
-    body: "Configura cantidad, técnica de impresión y zona del logo. Ves el precio unitario, el ahorro por volumen y el total con IVA en tiempo real.",
+    icon: QuoteIcon,
+    title: "Cotiza online al instante",
+    body: "Arma tu cotización con precios por volumen transparentes, sin esperar correos de ida y vuelta. Eliges producto, cantidad y técnica, y ves el precio en el momento.",
   },
   {
-    n: "02",
-    title: "Stock real + re-order programado",
-    body: "Consultamos el inventario en tiempo real. Si necesitas más unidades que el stock listo, calculamos la reposición desde origen y validamos que llegue a tu fecha.",
+    icon: PencilIcon,
+    title: "Sube tu logo y míralo puesto",
+    body: "Carga tu logo una vez y previsualízalo aplicado sobre cada producto antes de comprar. Apruebas sobre seguro, no a ciegas.",
   },
   {
-    n: "03",
-    title: "Preview del logo sobre cada producto",
-    body: "Sube tu logo y velo aplicado sobre el producto antes de aprobar. Calculamos el tamaño en centímetros reales sobre la zona de impresión.",
+    icon: BoltIcon,
+    title: "Stock express en Chile",
+    body: "Mantenemos stock listo en Chile para pedidos con poco plazo y mínimos bajos. Respuesta rápida cuando la fecha aprieta.",
   },
-] as const;
+  {
+    icon: ConfigureIcon,
+    title: "Fabricación propia a medida",
+    body: "Más de 40 años fabricando. Para proyectos especiales producimos a medida en nuestras fábricas en Oriente, con asesoría de diseño incluida.",
+  },
+];
 
 export function Pillars() {
   return (
     <section className="border-b border-rpc-border bg-rpc-bg">
-      <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
-        <p className="text-xs uppercase tracking-[0.25em] text-rpc-text/60">
-          Cómo trabajamos
+      <div className="mx-auto max-w-7xl px-6 py-20 lg:px-10 lg:py-24">
+        <p className="text-xs font-semibold uppercase tracking-wide text-rpc-info-dark">
+          Por qué con nosotros
         </p>
-        <h2 className="mt-4 max-w-2xl text-3xl font-light leading-[1.1] sm:text-4xl">
-          Una sola herramienta para todo el ciclo de compra corporativa.
+        <h2 className="mt-3 max-w-2xl text-3xl tracking-tight sm:text-4xl">
+          Lo mejor de dos mundos: fábrica propia y respuesta express.
         </h2>
 
-        <div className="mt-16 grid gap-12 md:grid-cols-3 md:gap-8">
-          {PILLARS.map((p) => (
-            <div key={p.n} className="flex flex-col gap-4 border-t border-rpc-text pt-6">
-              <span className="font-rpc-heading text-xs uppercase tracking-[0.25em] text-rpc-text/50">
-                {p.n}
-              </span>
-              <h3 className="text-xl font-light leading-tight sm:text-2xl">
-                {p.title}
-              </h3>
-              <p className="font-rpc-body text-sm normal-case tracking-normal text-rpc-text/75">
-                {p.body}
-              </p>
-            </div>
-          ))}
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {PILLARS.map((p, i) => {
+            const Icon = p.icon;
+            return (
+              <div
+                key={p.title}
+                className="flex flex-col gap-4 rounded-rpc-card border border-rpc-border bg-rpc-bg p-6 transition hover:border-rpc-accent/40 hover:shadow-sm"
+              >
+                <span
+                  className={
+                    i % 2 === 0
+                      ? "inline-flex h-11 w-11 items-center justify-center rounded-rpc-button bg-rpc-accent/10 text-rpc-accent-dark"
+                      : "inline-flex h-11 w-11 items-center justify-center rounded-rpc-button bg-rpc-info/10 text-rpc-info-dark"
+                  }
+                >
+                  <Icon className="h-6 w-6" />
+                </span>
+                <h3 className="font-rpc-heading text-lg font-bold leading-snug tracking-tight">
+                  {p.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-rpc-text/70">
+                  {p.body}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

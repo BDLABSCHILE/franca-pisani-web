@@ -1,49 +1,58 @@
-import Image from "next/image";
-
 /**
- * Logo wall de clientes corporativos.
+ * "Confían en nosotros" — muro tipográfico de clientes reales.
  *
- * Los 5 logos viven en /public/clients/*.png procesados con ImageMagick para
- * quitar fondo blanco/uniforme y recortar márgenes. Como son transparentes
- * reales, no necesitamos mix-blend-mode — el next/image + object-contain
- * dentro de un container de alto fijo normaliza la presentación.
- *
- * Source: clientes confirmados por Benja 2026-05-26, logos procesados localmente.
+ * Nombres relevados del muro de clientes del sitio actual del cliente
+ * (ropapublicitariachile.cl). Sin imágenes de logos: grid tipográfico
+ * elegante con hairlines. El id="clientes" es el anchor del nav.
  */
 
-const CLIENTS: readonly { slug: string; name: string }[] = [
-  { slug: "bayer", name: "Bayer" },
-  { slug: "astara", name: "Astara" },
-  { slug: "monsanto", name: "Monsanto" },
-  { slug: "ventisquero", name: "Viña Ventisquero" },
-  { slug: "check-fast-cherry", name: "Check Fast Cherry" },
-  { slug: "mypymes", name: "MyPYMES Chilenas" },
-];
+const CLIENTS = [
+  "Banco de Chile",
+  "Entel",
+  "LATAM",
+  "Ripley",
+  "Copec",
+  "Mercado Libre",
+  "Natura",
+  "LEGO",
+  "Red de Salud UC Christus",
+  "Viña Santa Carolina",
+  "Betterfly",
+  "TECHO",
+  "Mega",
+  "Carozzi",
+  "Turbus",
+  "Land Rover",
+] as const;
 
 export function LogoWall() {
   return (
-    <section className="border-b border-rpc-border bg-rpc-bg">
-      <div className="mx-auto max-w-7xl px-6 py-20 lg:px-10">
-        <p className="text-center text-xs uppercase tracking-[0.25em] text-rpc-text/50">
-          Empresas que confían en BØLG
+    <section id="clientes" className="scroll-mt-24 border-b border-rpc-border bg-rpc-bg">
+      <div className="mx-auto max-w-7xl px-6 py-20 lg:px-10 lg:py-24">
+        <p className="text-center text-xs font-semibold uppercase tracking-wide text-rpc-info-dark">
+          Confían en nosotros
         </p>
+        <h2 className="mx-auto mt-3 max-w-2xl text-center text-3xl tracking-tight sm:text-4xl">
+          Marcas que ya visten con nosotros.
+        </h2>
 
-        <div className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-rpc-card border border-rpc-border bg-rpc-border sm:grid-cols-3 lg:grid-cols-6">
-          {CLIENTS.map((c) => (
+        {/* Grid con hairlines: gap-px sobre fondo border simula la grilla */}
+        <div className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-rpc-card border border-rpc-border bg-rpc-border sm:grid-cols-3 lg:grid-cols-4">
+          {CLIENTS.map((name) => (
             <div
-              key={c.slug}
-              className="relative flex h-24 items-center justify-center bg-rpc-bg p-5"
+              key={name}
+              className="flex h-24 items-center justify-center bg-rpc-bg px-4 text-center"
             >
-              <Image
-                src={`/clients/${c.slug}.png`}
-                alt={`Logo ${c.name}`}
-                fill
-                sizes="(min-width: 1024px) 200px, (min-width: 640px) 240px, 50vw"
-                className="object-contain p-4"
-              />
+              <span className="font-rpc-heading text-sm font-bold tracking-tight text-rpc-text/45 transition hover:text-rpc-text sm:text-base">
+                {name}
+              </span>
             </div>
           ))}
         </div>
+
+        <p className="mt-6 text-center text-sm text-rpc-text/55">
+          …y muchas marcas más.
+        </p>
       </div>
     </section>
   );

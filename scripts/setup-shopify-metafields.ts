@@ -37,7 +37,8 @@ const DEFINITIONS: MetafieldDef[] = [
     name: "Elegible para corporativo",
     key: "eligible",
     namespace: "corporate",
-    description: "Confirma si este producto se muestra en corporativo.bolg.cl.",
+    description:
+      "Confirma si este producto se muestra en el catálogo corporativo de ropapublicitariachile.cl.",
     type: "boolean",
     visibleToStorefrontApi: true,
   },

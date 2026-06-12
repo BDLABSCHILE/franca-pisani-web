@@ -1,7 +1,8 @@
 /* eslint-disable @next/next/no-head-element -- HTML email, no es una página Next */
 
 /**
- * Email interno al equipo BØLG cuando alguien envía el formulario de contacto.
+ * Email interno al equipo de Ropa Publicitaria Chile cuando alguien envía
+ * el formulario de contacto.
  *
  * Similar a QuoteToSales pero más simple: sin tabla de productos, sin
  * adjuntos. Lo importante es el mensaje libre del usuario + sus datos de
@@ -18,12 +19,12 @@ export type ContactInquiryProps = {
 };
 
 const palette = {
-  text: "#2d2a26",
-  textMuted: "#6e6960",
-  border: "#e8e8e1",
+  text: "#101418",
+  textMuted: "#5b6168",
+  border: "#e6e8ea",
   bg: "#ffffff",
-  bgMuted: "#f6f6f3",
-  accent: "#682d2d",
+  bgMuted: "#f6f7f8",
+  accent: "#f07848",
 };
 
 const fontStack = "'Helvetica Neue', Helvetica, Arial, sans-serif";
@@ -213,7 +214,8 @@ export function ContactInquiry({
                             color: palette.textMuted,
                           }}
                         >
-                          Generado desde corporativo.bolg.cl/contacto
+                          Generado desde el formulario de contacto ·
+                          ropapublicitariachile.cl
                         </p>
                       </td>
                     </tr>

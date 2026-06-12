@@ -1,32 +1,33 @@
 /**
- * Métricas de track record. Cifras confirmadas con Benja 2026-05-26.
- * Usamos "+" para sugerir crecimiento sin comprometer el número exacto.
+ * Cifras defendibles de Ropa Publicitaria Chile — SOLO claims permitidos:
+ * 40+ años (desde 1982), modelo dual, respuesta <24 h y las 30+ marcas
+ * del muro de clientes. Nada inventado.
  */
 const METRICS = [
-  { value: "+1.000", label: "Unidades entregadas" },
-  { value: "+30", label: "Empresas atendidas" },
-  { value: "30%", label: "Tasa de recompra" },
-  { value: "+3", label: "Años en el mercado" },
+  { value: "40+", label: "años fabricando, desde 1982" },
+  { value: "2 modos", label: "stock express y fabricación a medida" },
+  { value: "<24 h", label: "tiempo de respuesta a tu cotización" },
+  { value: "30+", label: "marcas nos avalan" },
 ] as const;
 
 export function SuccessMetrics() {
   return (
-    <section className="border-b border-rpc-border bg-rpc-announcement text-rpc-button-text">
-      <div className="mx-auto max-w-7xl px-6 py-20 lg:px-10">
-        <p className="text-xs uppercase tracking-[0.25em] opacity-60">
+    <section className="border-b border-rpc-border bg-rpc-announcement text-white">
+      <div className="mx-auto max-w-7xl px-6 py-20 lg:px-10 lg:py-24">
+        <p className="text-xs font-semibold uppercase tracking-wide text-rpc-info">
           Track record
         </p>
-        <h2 className="mt-4 max-w-2xl text-3xl font-light leading-[1.1] sm:text-4xl">
-          Cifras que respaldan cada cotización.
+        <h2 className="mt-3 max-w-2xl text-3xl tracking-tight sm:text-4xl">
+          Lo que respalda cada pedido.
         </h2>
 
-        <dl className="mt-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <dl className="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {METRICS.map((m) => (
-            <div key={m.label} className="border-t border-white/20 pt-6">
-              <dd className="font-rpc-heading text-4xl font-light leading-none sm:text-5xl">
+            <div key={m.label} className="border-t-2 border-rpc-accent pt-6">
+              <dd className="font-rpc-heading text-4xl font-bold leading-none tracking-tight sm:text-5xl">
                 {m.value}
               </dd>
-              <dt className="mt-3 text-xs uppercase tracking-[0.25em] opacity-70">
+              <dt className="mt-3 text-sm leading-snug text-white/70">
                 {m.label}
               </dt>
             </div>

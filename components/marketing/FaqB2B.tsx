@@ -1,65 +1,66 @@
 /**
- * FAQ B2B. Copy alineado con la página /como-funciona y el PDF de cotización.
- * Source of truth para condiciones comerciales: mínimo 10 unidades, lead time
- * de reposición ~150 días, pago 50/50, factura electrónica.
+ * FAQ B2B del rubro textil corporativo. Respuestas honestas sin cifras
+ * inventadas: donde el dato depende del producto, se dice explícitamente
+ * ("lo ves en cada ficha" / "se confirma en la cotización").
+ * Claims permitidos: 40+ años, modelo dual, respuesta <24 h.
  */
 const FAQS = [
   {
-    q: "¿Cuál es el mínimo de pedido?",
-    a: "El mínimo es 10 unidades por producto. Puedes combinar varios productos distintos en una sola cotización para llegar a volúmenes mayores y aprovechar tramos de precio.",
+    q: "¿Cuál es el mínimo de pedido por producto?",
+    a: "Depende del producto y del modo de trabajo. Los productos con stock express en Chile operan con mínimos bajos; los proyectos de fabricación a medida requieren volúmenes mayores porque se producen desde cero. El mínimo concreto lo ves en cada ficha del catálogo, y si tienes dudas el equipo te lo confirma al cotizar.",
   },
   {
-    q: "¿Cuánto se demora la producción?",
-    a: "Si el producto está en stock, la personalización toma entre 7 y 15 días hábiles según la técnica. Si necesitas más unidades de las que tenemos en bodega, hacemos reposición desde origen con un lead time aproximado de 150 días desde la orden de compra. La ficha de cada producto calcula automáticamente el timeline real para tu cantidad y fecha objetivo.",
+    q: "¿Qué técnica de personalización me conviene?",
+    a: "Trabajamos bordado, serigrafía (1 color y full color), transfer DTF y sublimación. La elección depende de la prenda, del diseño y de la cantidad: el bordado da un acabado premium en camisas y polerones; la serigrafía rinde muy bien en volúmenes altos; el DTF y la sublimación permiten full color con detalle fino. Cada ficha muestra las técnicas disponibles, y al cotizar te recomendamos la que mejor calza con tu caso.",
   },
   {
-    q: "¿Qué técnicas de personalización ofrecen?",
-    a: "Serigrafía 1 color y full color, bordado, transfer DTF y grabado láser. Cada producto muestra qué técnicas están disponibles para sus zonas de impresión, junto al costo extra y al tiempo adicional.",
+    q: "¿Puedo mezclar tallas en un mismo pedido?",
+    a: "Sí. Defines tu curva de tallas dentro de la cantidad total del pedido — por ejemplo, distintas cantidades de S, M, L y XL de la misma prenda. Si no tienes clara la distribución para tu equipo, te ayudamos a armarla.",
   },
   {
-    q: "¿Cómo se factura y qué formas de pago aceptan?",
-    a: "Emitimos factura electrónica a nombre de tu empresa (necesitamos razón social, RUT y giro). Operamos típicamente con 50% al confirmar la orden y 50% antes del despacho. Pago vía transferencia electrónica.",
+    q: "¿Puedo ver una muestra antes de producir?",
+    a: "Sí, en dos niveles. En el sitio puedes subir tu logo y verlo aplicado sobre el producto al instante. Y antes de entrar a producción, el equipo valida contigo el arte final (mockup) para que apruebes sobre seguro.",
   },
   {
-    q: "Los precios que veo, ¿incluyen IVA?",
-    a: "El cotizador muestra ambos valores: subtotal neto y total bruto con IVA (19%). En el PDF de la cotización ves cada línea detallada para que tu equipo de finanzas la revise sin ambigüedad.",
+    q: "¿Cuáles son los plazos de entrega?",
+    a: "Depende del modo. Los pedidos con stock express en Chile salen más rápido, porque la prenda ya está acá y solo se personaliza. Los proyectos de fabricación a medida toman más tiempo, porque se producen desde cero en nuestras fábricas. El plazo concreto depende del producto, la cantidad y la técnica — te lo confirmamos en la cotización, con respuesta en menos de 24 horas.",
   },
   {
-    q: "¿Hacen despachos a todo Chile?",
-    a: "Sí. Despachamos a todo el país con un partner logístico. El costo del despacho se confirma en la cotización final según volumen y destino.",
+    q: "¿Emiten factura? ¿Cómo se manejan los precios con IVA?",
+    a: "Sí, emitimos factura electrónica a nombre de tu empresa (necesitamos razón social, RUT y giro). En la cotización formal ves el detalle de valores netos e IVA línea por línea, para que tu equipo de finanzas lo revise sin ambigüedad.",
   },
   {
-    q: "¿Puedo aprobar la cotización sin crear cuenta?",
-    a: "Sí. Cuando generes una cotización te enviamos un link público que puedes compartir con tu jefatura o equipo de finanzas. Pueden revisarla y aprobarla solo con email + RUT de la empresa.",
+    q: "¿Despachan a regiones?",
+    a: "Sí, despachamos a todo Chile. El costo y el plazo del despacho dependen del volumen y del destino, y se confirman en la cotización final junto con el resto de las condiciones.",
   },
 ] as const;
 
 export function FaqB2B() {
   return (
     <section className="border-b border-rpc-border bg-rpc-bg">
-      <div className="mx-auto max-w-4xl px-6 py-24 lg:px-10">
-        <p className="text-xs uppercase tracking-[0.25em] text-rpc-text/60">
+      <div className="mx-auto max-w-4xl px-6 py-20 lg:px-10 lg:py-24">
+        <p className="text-xs font-semibold uppercase tracking-wide text-rpc-info-dark">
           Preguntas frecuentes
         </p>
-        <h2 className="mt-4 text-3xl font-light leading-[1.1] sm:text-4xl">
+        <h2 className="mt-3 text-3xl tracking-tight sm:text-4xl">
           Las dudas que escuchamos más seguido.
         </h2>
 
         <dl className="mt-12 divide-y divide-rpc-border border-t border-b border-rpc-border">
           {FAQS.map((faq) => (
             <details key={faq.q} className="group py-6">
-              <summary className="flex cursor-pointer items-start justify-between gap-6 list-none">
-                <dt className="font-rpc-heading text-base uppercase tracking-[0.1em] text-rpc-text sm:text-lg">
+              <summary className="flex cursor-pointer list-none items-start justify-between gap-6">
+                <dt className="font-rpc-heading text-base font-bold tracking-tight text-rpc-text sm:text-lg">
                   {faq.q}
                 </dt>
                 <span
                   aria-hidden
-                  className="mt-1 select-none font-rpc-heading text-2xl font-light leading-none text-rpc-text/60 transition group-open:rotate-45"
+                  className="mt-0.5 select-none font-rpc-heading text-2xl leading-none text-rpc-accent transition group-open:rotate-45"
                 >
                   +
                 </span>
               </summary>
-              <dd className="mt-4 max-w-3xl font-rpc-body text-sm normal-case tracking-normal text-rpc-text/75 sm:text-base">
+              <dd className="mt-4 max-w-3xl text-sm leading-relaxed text-rpc-text/70 sm:text-base">
                 {faq.a}
               </dd>
             </details>

@@ -1,19 +1,20 @@
 /* eslint-disable @next/next/no-head-element -- HTML email, no es una página Next */
 import type { CartLine } from "@/lib/quote/storage";
 import { formatCLP, IVA_RATE } from "@/lib/utils/money";
+import { CONTACT, CONTACT_LINKS } from "@/lib/brand/contacts";
 
 /**
  * Email transaccional al cliente cuando termina su cotización.
  *
  * Diseño: tabla simple, sin grids ni flex (Outlook los rompe). Estilos inline,
- * paleta BØLG (texto #2d2a26, accent #682d2d). El PDF formal va como attachment
- * en la request a Resend; este mail es la cara visible que llega al inbox.
+ * paleta RPC (tinta #101418, coral #f07848, celeste #18c0f0). El PDF formal
+ * va como attachment en la request a Resend; este mail es la cara visible
+ * que llega al inbox.
  */
 
 export type QuoteCreatedProps = {
   quoteNumber: string;
   createdAt: Date;
-  validityDays: number;
   customer: {
     companyName: string;
     contactName: string;
@@ -23,20 +24,19 @@ export type QuoteCreatedProps = {
 };
 
 const palette = {
-  text: "#2d2a26",
-  textMuted: "#6e6960",
-  border: "#e8e8e1",
+  text: "#101418",
+  textMuted: "#5b6168",
+  border: "#e6e8ea",
   bg: "#ffffff",
-  bgMuted: "#f6f6f3",
-  accent: "#682d2d",
+  bgMuted: "#f6f7f8",
+  accent: "#f07848",
+  info: "#18c0f0",
 };
 
 const fontStack = "'Helvetica Neue', Helvetica, Arial, sans-serif";
 
 export function QuoteCreated({
   quoteNumber,
-  createdAt,
-  validityDays,
   customer,
   lines,
 }: QuoteCreatedProps) {
@@ -45,15 +45,12 @@ export function QuoteCreated({
   const totalGross = subtotalNet + iva;
   const totalUnits = lines.reduce((s, l) => s + l.quantity, 0);
 
-  const validUntil = new Date(createdAt);
-  validUntil.setDate(validUntil.getDate() + validityDays);
-
   return (
     <html lang="es-CL">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Cotización {quoteNumber} · BØLG Corporativo</title>
+        <title>Cotización {quoteNumber} · Ropa Publicitaria Chile</title>
       </head>
       <body
         style={{
@@ -84,6 +81,7 @@ export function QuoteCreated({
                     width: "100%",
                     backgroundColor: palette.bg,
                     border: `1px solid ${palette.border}`,
+                    borderTop: `4px solid ${palette.accent}`,
                   }}
                 >
                   <tbody>
@@ -98,13 +96,14 @@ export function QuoteCreated({
                         <p
                           style={{
                             margin: 0,
-                            fontSize: 22,
-                            letterSpacing: "0.18em",
-                            fontWeight: 300,
+                            fontSize: 18,
+                            letterSpacing: "0.1em",
+                            fontWeight: 700,
                             color: palette.text,
                           }}
                         >
-                          BØLG
+                          <span style={{ color: palette.accent }}>◆</span>{" "}
+                          ROPA PUBLICITARIA CHILE
                         </p>
                         <p
                           style={{
@@ -115,7 +114,7 @@ export function QuoteCreated({
                             color: palette.textMuted,
                           }}
                         >
-                          Corporativo · Cotización
+                          Vestuario corporativo · Cotización
                         </p>
                       </td>
                     </tr>
@@ -138,7 +137,7 @@ export function QuoteCreated({
                           style={{
                             margin: "12px 0 0",
                             fontSize: 24,
-                            fontWeight: 300,
+                            fontWeight: 700,
                             lineHeight: 1.2,
                             color: palette.text,
                           }}
@@ -154,10 +153,11 @@ export function QuoteCreated({
                             color: palette.text,
                           }}
                         >
-                          Gracias por considerar a BØLG para los regalos
-                          corporativos de <strong>{customer.companyName}</strong>.
-                          Adjuntamos el PDF formal con el detalle de los productos
-                          y los términos comerciales.
+                          Gracias por cotizar con Ropa Publicitaria Chile el
+                          vestuario corporativo de{" "}
+                          <strong>{customer.companyName}</strong>. Adjuntamos el
+                          PDF con el detalle de los productos y las condiciones
+                          comerciales.
                         </p>
                         <p
                           style={{
@@ -167,10 +167,10 @@ export function QuoteCreated({
                             color: palette.text,
                           }}
                         >
-                          Nuestro equipo comercial revisará tu requerimiento y te
-                          escribirá el mismo día hábil para confirmar lead time,
-                          stock por talla/color y, si corresponde, hacer el
-                          mockup digital del logo aplicado.
+                          Nuestro equipo revisará tu requerimiento y te
+                          contactará en menos de 24 horas hábiles para confirmar
+                          precios, stock y plazos, y coordinar contigo los
+                          siguientes pasos.
                         </p>
                       </td>
                     </tr>
@@ -224,7 +224,7 @@ export function QuoteCreated({
                       </td>
                     </tr>
 
-                    {/* Validez */}
+                    {/* Carácter referencial */}
                     <tr>
                       <td style={{ padding: "16px 32px 8px" }}>
                         <p
@@ -235,12 +235,12 @@ export function QuoteCreated({
                             color: palette.textMuted,
                           }}
                         >
-                          Esta cotización es válida hasta el{" "}
+                          Esta cotización es{" "}
                           <strong style={{ color: palette.text }}>
-                            {formatDateLong(validUntil)}
-                          </strong>
-                          . Los precios pueden ajustarse después de esa fecha
-                          según costos y disponibilidad del proveedor.
+                            referencial
+                          </strong>{" "}
+                          y será confirmada por nuestro equipo en menos de 24
+                          horas hábiles.
                         </p>
                       </td>
                     </tr>
@@ -268,12 +268,15 @@ export function QuoteCreated({
                             color: palette.text,
                           }}
                         >
-                          <li>Revisamos disponibilidad real por talla/color.</li>
-                          <li>Confirmamos lead time y fecha de despacho.</li>
+                          <li>
+                            Revisamos disponibilidad: stock express en Chile o
+                            fabricación a medida.
+                          </li>
+                          <li>Confirmamos precios y plazo de entrega.</li>
                           <li>Te enviamos el mockup digital con tu logo aplicado.</li>
                           <li>
-                            Confirmas y emitimos la orden con la forma de pago
-                            acordada (50% / 50% es lo habitual).
+                            Apruebas y coordinamos la producción con nuestro
+                            equipo.
                           </li>
                         </ol>
                       </td>
@@ -293,10 +296,17 @@ export function QuoteCreated({
                           ¿Necesitas ajustar algo? Responde este correo y nos
                           coordinamos directamente. También puedes escribir a{" "}
                           <a
-                            href="mailto:benjamin@bolg.cl"
+                            href={`mailto:${CONTACT.email}`}
                             style={{ color: palette.accent, textDecoration: "none" }}
                           >
-                            benjamin@bolg.cl
+                            {CONTACT.email}
+                          </a>{" "}
+                          o por WhatsApp al{" "}
+                          <a
+                            href={CONTACT_LINKS.whatsapp}
+                            style={{ color: palette.accent, textDecoration: "none" }}
+                          >
+                            {CONTACT.whatsappDisplay}
                           </a>
                           .
                         </p>
@@ -321,7 +331,7 @@ export function QuoteCreated({
                             color: palette.textMuted,
                           }}
                         >
-                          BØLG Concept · corporativo.bolg.cl
+                          Ropa Publicitaria Chile · ropapublicitariachile.cl
                         </p>
                         <p
                           style={{
@@ -331,7 +341,7 @@ export function QuoteCreated({
                           }}
                         >
                           Este correo se envió a {customer.contactEmail} porque
-                          enviaste una cotización desde corporativo.bolg.cl.
+                          solicitaste una cotización en ropapublicitariachile.cl.
                         </p>
                       </td>
                     </tr>
@@ -368,7 +378,7 @@ function SummaryRow({
     padding: emphasis ? "14px 0" : "8px 0",
     textAlign: "right",
     fontSize: emphasis ? 18 : 13,
-    fontWeight: emphasis ? 300 : 400,
+    fontWeight: emphasis ? 700 : 400,
     color: muted ? palette.textMuted : palette.text,
   };
   return (
@@ -381,12 +391,4 @@ function SummaryRow({
       <td style={valueStyle}>{value}</td>
     </tr>
   );
-}
-
-function formatDateLong(date: Date): string {
-  return new Intl.DateTimeFormat("es-CL", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(date);
 }

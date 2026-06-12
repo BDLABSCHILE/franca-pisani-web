@@ -6,14 +6,14 @@ import { ContactForm } from "@/components/contact/ContactForm";
 export const metadata: Metadata = {
   title: "Contacto",
   description:
-    "Habla directo con el equipo corporativo de BØLG. WhatsApp, email o formulario. Respondemos el mismo día hábil.",
+    "Habla con el equipo de Ropa Publicitaria Chile. WhatsApp, email o formulario. Cotiza sin compromiso: te respondemos en menos de 24 horas.",
 };
 
 /**
  * /contacto — página con dos vías de entrada:
  *  1. Canales directos (WhatsApp + email) destacados arriba para urgencias.
  *  2. Formulario abajo, conectado al Server Action submitContactAction
- *     que envía a benjamin@bolg.cl vía Resend.
+ *     que envía al correo del equipo vía Resend.
  *
  * El form es client component (useActionState) pero la página se mantiene
  * server para que el HTML inicial cargue rápido y bien indexable.
@@ -27,12 +27,13 @@ export default function ContactoPage() {
           <p className="text-[10px] uppercase tracking-[0.25em] text-rpc-text/60 sm:text-xs">
             Contacto
           </p>
-          <h1 className="mt-4 max-w-3xl text-3xl font-light leading-[1.05] sm:mt-6 sm:text-4xl lg:text-5xl">
-            Habla directo con el equipo corporativo de BØLG.
+          <h1 className="mt-4 max-w-3xl text-3xl leading-[1.05] sm:mt-6 sm:text-4xl lg:text-5xl">
+            Habla directo con el equipo de Ropa Publicitaria Chile.
           </h1>
           <p className="mt-6 max-w-2xl font-rpc-body text-base normal-case tracking-normal text-rpc-text/75 sm:mt-8 sm:text-lg">
-            Si necesitas algo a medida, una cotización urgente o referencias
-            para tu industria, escríbenos. Respondemos el mismo día hábil.
+            Si tienes un proyecto a medida, una cotización urgente o dudas
+            sobre técnicas y cantidades, escríbenos. Cotiza sin compromiso:
+            te respondemos en menos de 24 horas.
           </p>
 
           {/* CTAs directos: WhatsApp + Email. Para usuarios que ya tienen
@@ -70,7 +71,7 @@ export default function ContactoPage() {
               </h2>
               <p className="mt-4 font-rpc-body text-sm normal-case tracking-normal text-rpc-text/70">
                 Si prefieres dejar el detalle por escrito, este formulario
-                llega directo a Benjamín en BØLG. Sin filtros, sin call center.
+                llega directo al equipo. Sin filtros, sin call center.
               </p>
             </div>
 
@@ -79,16 +80,24 @@ export default function ContactoPage() {
         </div>
       </section>
 
-      {/* Redes sociales como complemento */}
+      {/* Dirección + redes sociales como complemento */}
       <section className="bg-rpc-bg">
         <div className="mx-auto max-w-5xl px-6 py-16 lg:px-10 lg:py-20">
           <p className="text-xs uppercase tracking-[0.25em] text-rpc-text/60">
-            También en
+            También nos encuentras
           </p>
-          <div className="mt-8 grid gap-x-10 gap-y-8 sm:grid-cols-2">
+          <div className="mt-8 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="border-t border-rpc-border pt-4">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-rpc-text/50">
+                Dirección
+              </p>
+              <p className="mt-2 font-rpc-body text-lg normal-case tracking-normal text-rpc-text">
+                {CONTACT.direccion}
+              </p>
+            </div>
             <SocialItem
               label="Instagram"
-              value="@bolg.cl"
+              value="@ropapublicitariachile"
               href={rpcTokens.social.instagram}
             />
             <SocialItem

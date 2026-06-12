@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { CorporateProduct } from "@/lib/shopify/types";
 import { formatCLP } from "@/lib/utils/money";
 import { StockBadge, type StockScenario } from "./StockBadge";
+import { LogoOverlayBadge } from "./LogoOverlayBadge";
 
 type Props = {
   product: CorporateProduct;
@@ -40,6 +41,10 @@ export function ProductCard({ product, stockTotal }: Props) {
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 50vw"
           className="object-cover transition duration-500 group-hover:scale-[1.02]"
         />
+        <FlowBadge tags={product.tags} />
+        {/* Client island: si el visitante subió su logo, lo muestra aplicado
+            sobre la foto. El card completo sigue siendo server component. */}
+        <LogoOverlayBadge />
       </div>
 
       <div className="flex flex-col gap-1.5 sm:gap-2">
@@ -74,4 +79,30 @@ export function ProductCard({ product, stockTotal }: Props) {
       </div>
     </Link>
   );
+}
+
+/**
+ * Badge del modelo dual de RPC sobre la foto del producto:
+ *  - tag "stock-express" → celeste: producto en Chile, respuesta rápida.
+ *  - tag "fabricacion"   → gris: proyecto a medida desde fábrica.
+ *
+ * Complementa (no reemplaza) al StockBadge de inventario bajo el título:
+ * uno dice por qué flujo va el producto, el otro cuánto stock hay hoy.
+ */
+function FlowBadge({ tags }: { tags: string[] }) {
+  if (tags.includes("stock-express")) {
+    return (
+      <span className="absolute left-2 top-2 rounded-full bg-rpc-info px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.1em] text-white sm:text-[10px] sm:tracking-[0.12em]">
+        Stock Express
+      </span>
+    );
+  }
+  if (tags.includes("fabricacion")) {
+    return (
+      <span className="absolute left-2 top-2 rounded-full border border-rpc-border bg-rpc-surface px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.1em] text-rpc-text/70 sm:text-[10px] sm:tracking-[0.12em]">
+        Fabricación a medida
+      </span>
+    );
+  }
+  return null;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { fileToStoredLogo, setStoredLogo } from "@/lib/logo/store";
 import { cn } from "@/lib/utils/cn";
 
 /**
@@ -18,6 +19,12 @@ export type LogoState = {
 type Props = {
   logo: LogoState;
   onChange: (logo: LogoState) => void;
+  /**
+   * True cuando el logo actual vino precargado del store global
+   * (lib/logo/store.ts) y no de un upload en esta página. Muestra el aviso
+   * "Usando tu logo guardado" con opción de cambiarlo.
+   */
+  fromSavedLogo?: boolean;
 };
 
 const ACCEPTED_TYPES = ["image/png", "image/svg+xml", "image/jpeg"] as const;
@@ -29,7 +36,7 @@ type ValidationError =
   | { kind: "lowres"; widthPx: number }
   | null;
 
-export function LogoUploader({ logo, onChange }: Props) {
+export function LogoUploader({ logo, onChange, fromSavedLogo = false }: Props) {
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<ValidationError>(null);
   const [warning, setWarning] = useState<ValidationError>(null);
@@ -72,6 +79,16 @@ export function LogoUploader({ logo, onChange }: Props) {
       };
       reader.readAsDataURL(file);
 
+      // Además del estado local, persistimos el logo en el store global
+      // (lib/logo/store.ts): así el catálogo completo y los demás productos
+      // lo recuerdan sin que el cliente lo vuelva a subir. Fire-and-forget:
+      // si localStorage falla, la página actual sigue funcionando igual.
+      void fileToStoredLogo(file)
+        .then(setStoredLogo)
+        .catch(() => {
+          /* el logo local sigue vivo; solo no quedó persistido */
+        });
+
       // Para PNG/JPG verificamos resolución mínima recomendada (1000px).
       // SVG es vectorial — siempre OK.
       if (file.type !== "image/svg+xml") {
@@ -106,6 +123,19 @@ export function LogoUploader({ logo, onChange }: Props) {
   if (logoUrl) {
     return (
       <div className="rounded-rpc-card border border-rpc-text bg-rpc-image-bg-light p-4">
+        {fromSavedLogo && (
+          <p className="mb-3 flex flex-wrap items-center gap-1.5 text-xs text-rpc-info-dark">
+            <span aria-hidden>✓</span>
+            Usando tu logo guardado
+            <button
+              type="button"
+              onClick={remove}
+              className="underline underline-offset-4 transition hover:text-rpc-text"
+            >
+              (cambiar)
+            </button>
+          </p>
+        )}
         <div className="flex items-center gap-3">
           <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-sm bg-rpc-bg">
             {/* eslint-disable-next-line @next/next/no-img-element */}

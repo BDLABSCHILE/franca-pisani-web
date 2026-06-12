@@ -105,7 +105,7 @@ export default async function PDPPage({ params }: Props) {
             Sobre el producto
           </p>
           <div
-            className="prose-bolg mt-6 max-w-3xl font-rpc-body text-base normal-case tracking-normal text-rpc-text/80 [&_a]:underline [&_a]:underline-offset-4 [&_img]:my-6 [&_img]:rounded-rpc-card [&_p]:mt-4 [&_p:first-child]:mt-0 [&_strong]:font-medium [&_strong]:text-rpc-text"
+            className="mt-6 max-w-3xl font-rpc-body text-base normal-case tracking-normal text-rpc-text/80 [&_a]:underline [&_a]:underline-offset-4 [&_img]:my-6 [&_img]:rounded-rpc-card [&_p]:mt-4 [&_p:first-child]:mt-0 [&_strong]:font-medium [&_strong]:text-rpc-text"
             dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
           />
         </section>

@@ -77,7 +77,7 @@ export function ContactForm() {
             name="message"
             rows={5}
             required
-            placeholder="Cuéntanos qué estás buscando: tipo de regalo, cantidad aproximada, fecha objetivo, contexto. Mientras más detalle, mejor la primera propuesta."
+            placeholder="Cuéntanos qué necesitas: tipo de prenda o producto, cantidad aproximada, técnica si ya la tienes clara, fecha objetivo. Mientras más detalle, mejor la primera respuesta."
             aria-invalid={Boolean(errors.message)}
             className={cn(
               "mt-2 block w-full resize-none border bg-transparent p-3 font-rpc-body text-sm normal-case tracking-normal text-rpc-text placeholder:text-rpc-text/30 focus:outline-none",
@@ -112,7 +112,7 @@ export function ContactForm() {
             Mensaje enviado
           </p>
           <p className="mt-2 font-rpc-body text-sm normal-case tracking-normal text-rpc-text/80">
-            Recibimos tu mensaje. Te respondemos el mismo día hábil al email
+            Recibimos tu mensaje. Te respondemos en menos de 24 horas al email
             que dejaste.
             {state.dryRun && (
               <span className="mt-2 block text-[11px] uppercase tracking-[0.18em] text-rpc-text/50">
@@ -125,7 +125,8 @@ export function ContactForm() {
 
       <div className="sm:col-span-2 sm:flex sm:items-center sm:justify-between sm:gap-4">
         <p className="text-[11px] font-rpc-body normal-case tracking-normal text-rpc-text/50">
-          Respondemos el mismo día hábil. Sin spam, sin secuencias automáticas.
+          Te respondemos en menos de 24 horas. Sin spam, sin secuencias
+          automáticas.
         </p>
         <button
           type="submit"

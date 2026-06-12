@@ -26,10 +26,10 @@ export type InventoryLevel = {
 const RETAIL_RESERVE_RATIO = 0.1;
 
 /**
- * Suma "available" de todas las ubicaciones activas. Hoy en BØLG son 2:
- * "Bodega KW" y "Tienda BOLG Renato Sanchez". Si en el futuro hay que excluir
- * alguna (ej. tiendas físicas no comprometibles a corporativo), agregamos
- * un filtro acá sin tocar el resto del código.
+ * Suma "available" de todas las ubicaciones activas del Shopify del cliente.
+ * Si en el futuro hay que excluir alguna (ej. tiendas físicas no
+ * comprometibles a corporativo), agregamos un filtro acá sin tocar el resto
+ * del código.
  */
 const INVENTORY_QUERY = /* GraphQL */ `
   query VariantInventory($id: ID!) {

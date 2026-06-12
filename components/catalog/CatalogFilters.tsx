@@ -17,13 +17,38 @@ type Props = {
 };
 
 /**
+ * Orden canónico de las categorías de Ropa Publicitaria Chile — el mismo del
+ * menú de su sitio. Las categorías se derivan de los productos (si una no
+ * tiene productos, no aparece), pero se ordenan según esta lista; cualquier
+ * categoría fuera de ella va al final en orden alfabético.
+ */
+const RPC_CATEGORY_ORDER = [
+  "Poleras",
+  "Polerones y Polar",
+  "Camisas",
+  "Pantalones y Ropa Técnica",
+  "Jockeys y Gorros",
+  "Merchandising",
+] as const;
+
+function categoryRank(category: string): number {
+  const i = (RPC_CATEGORY_ORDER as readonly string[]).indexOf(category);
+  return i === -1 ? RPC_CATEGORY_ORDER.length : i;
+}
+
+/**
  * Filtros server-side, sincronizados con la URL.
  *
  * Cada filtro renderea links a /catalogo?param=value para mantener el
  * estado en la URL (compartible, indexable, sin JS adicional).
  */
 export function CatalogFilters({ products, active }: Props) {
-  const categories = Array.from(new Set(products.map((p) => p.category))).sort();
+  const categories = Array.from(new Set(products.map((p) => p.category))).sort(
+    (a, b) => categoryRank(a) - categoryRank(b) || a.localeCompare(b),
+  );
+  // Técnicas reales de RPC: bordado, serigrafía (1 color y full), transfer
+  // DTF y sublimación. Derivadas de los productos para no listar técnicas
+  // sin productos que las ofrezcan.
   const techniques = Array.from(
     new Set(products.flatMap((p) => p.printTechniques.map((t) => t.label))),
   ).sort();
@@ -71,8 +96,8 @@ export function CatalogFilters({ products, active }: Props) {
       <FilterGroup
         label="Ordenar por"
         items={[
-          // Default: mayor a menor precio para que mochilas y bolsos (productos
-          // ancla, más caros) abran el catálogo. Decisión de merchandising.
+          // Default: mayor a menor precio para que las prendas ancla (más
+          // caras: chaquetas, polerones) abran el catálogo.
           { label: "Precio: mayor a menor", value: undefined, active: !active.sort || active.sort === "price_desc" },
           { label: "Precio: menor a mayor", value: "price_asc", active: active.sort === "price_asc" },
         ]}
@@ -159,7 +184,7 @@ export function applyFilters(
       (x) => (stockByProductId[x.id] ?? 0) > STOCK_READY_THRESHOLD,
     );
   }
-  // Default: mayor a menor precio (mochilas y bolsos al inicio).
+  // Default: mayor a menor precio (prendas ancla al inicio).
   // Si el usuario explícitamente elige price_asc, respetamos eso.
   if (p.sort === "price_asc") {
     out.sort((a, b) => firstPrice(a) - firstPrice(b));

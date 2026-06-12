@@ -1,39 +1,40 @@
-import Image from "next/image";
 import Link from "next/link";
+import { Logo } from "./Logo";
 import { rpcTokens } from "@/lib/brand/rpc-tokens";
 import { CONTACT, CONTACT_LINKS } from "@/lib/brand/contacts";
 
 export function BrandFooter() {
   return (
-    <footer className="mt-24 border-t border-rpc-border bg-rpc-bg">
+    <footer className="border-t border-rpc-border bg-rpc-surface">
       <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 md:grid-cols-4 lg:px-10">
         <div className="md:col-span-2">
-          {/* Lockup "BØLG Corporativo" — misma marca que el header pero más grande */}
-          <Image
-            src="/brand/rpc-corporativo-lockup.png"
-            alt="BØLG Corporativo"
-            width={1902}
-            height={936}
-            className="h-16 w-auto"
-          />
-          <p className="mt-6 max-w-xs text-sm leading-relaxed text-rpc-text/70">
-            Plataforma corporativa de BØLG. Cotiza productos personalizados con tu logo,
-            con stock real, timelines y precios por volumen.
+          <Logo className="h-12 w-auto" />
+          <p className="mt-6 max-w-sm text-sm leading-relaxed text-rpc-text/70">
+            Fabricantes de vestuario corporativo y merchandising desde 1982.
+            Stock express en Chile y fabricación a medida en nuestras fábricas,
+            con asesoría de diseño.
           </p>
+          <p className="mt-4 text-sm text-rpc-text/55">{CONTACT.direccion}</p>
         </div>
 
         <div>
-          <h3 className="text-xs uppercase tracking-[0.18em] text-rpc-text">Plataforma</h3>
+          <h3 className="font-rpc-heading text-sm font-bold tracking-tight text-rpc-text">
+            Navegación
+          </h3>
           <ul className="mt-4 space-y-2 text-sm text-rpc-text/70">
             <li><Link href="/catalogo" className="transition hover:text-rpc-text">Catálogo</Link></li>
+            <li><Link href="/como-funciona" className="transition hover:text-rpc-text">Cómo funciona</Link></li>
+            <li><Link href={"/casos-de-exito" as never} className="transition hover:text-rpc-text">Clientes</Link></li>
             <li><Link href="/cotizador" className="transition hover:text-rpc-text">Cotizador</Link></li>
             <li><Link href="/mis-cotizaciones" className="transition hover:text-rpc-text">Mis cotizaciones</Link></li>
-            <li><Link href="/como-funciona" className="transition hover:text-rpc-text">Cómo funciona</Link></li>
+            <li><Link href="/contacto" className="transition hover:text-rpc-text">Contacto</Link></li>
           </ul>
         </div>
 
         <div>
-          <h3 className="text-xs uppercase tracking-[0.18em] text-rpc-text">Contacto</h3>
+          <h3 className="font-rpc-heading text-sm font-bold tracking-tight text-rpc-text">
+            Contacto
+          </h3>
           <ul className="mt-4 space-y-2 text-sm text-rpc-text/70">
             <li>
               <a href={CONTACT_LINKS.whatsapp} target="_blank" rel="noreferrer noopener" className="transition hover:text-rpc-text">
@@ -57,9 +58,19 @@ export function BrandFooter() {
       </div>
 
       <div className="border-t border-rpc-border">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 text-xs uppercase tracking-[0.18em] text-rpc-text/50 lg:px-10">
-          <span>© {new Date().getFullYear()} BØLG</span>
-          <span>Hecho en Chile</span>
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-6 py-6 text-xs text-rpc-text/50 sm:flex-row lg:px-10">
+          <span>
+            © {new Date().getFullYear()} {CONTACT.razonSocial} · Ropa Publicitaria Chile
+          </span>
+          {/* Crédito discreto del estudio */}
+          <a
+            href="https://bdlabs.cl"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="text-rpc-text/40 transition hover:text-rpc-text/70"
+          >
+            Hecho por BDLABS · bdlabs.cl
+          </a>
         </div>
       </div>
     </footer>

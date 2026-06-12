@@ -8,6 +8,32 @@ import { removeLine, clearCart, updateLine, type CartLine } from "@/lib/quote/st
 import { formatCLP, IVA_RATE } from "@/lib/utils/money";
 import { QuoteSubmitDrawer } from "./QuoteSubmitDrawer";
 
+/**
+ * Estimación client-side del subtotal neto de una línea con su cantidad
+ * actual, usando el último precio unitario del snapshot de pricing.
+ * Es exacta mientras la cantidad no cruce un volume break; si lo cruza es
+ * solo una aproximación — por eso la UI la marca como "estimado" y el precio
+ * definitivo lo fija el recálculo server-side de submitQuoteAction.
+ */
+function estimatedSubtotalNet(line: CartLine): number {
+  return (
+    line.quantity *
+      (line.pricing.unitPriceNet + line.pricing.customizationUnitPrice) +
+    line.pricing.setupFee
+  );
+}
+
+/**
+ * Detecta si la cantidad cambió después del snapshot de pricing (steppers ±).
+ * Derivación pura: si el subtotal guardado no coincide con el recalculado a
+ * partir de la cantidad actual, la línea fue ajustada y su precio es estimado.
+ * No requiere cambiar el shape de CartLine ni estado extra, y sobrevive
+ * recargas de página (el flag "estimado" se deduce siempre del storage).
+ */
+function isEstimated(line: CartLine): boolean {
+  return Math.abs(estimatedSubtotalNet(line) - line.pricing.subtotalNet) > 0.5;
+}
+
 export function QuoteBuilder() {
   const { lines, count, ready } = useCart();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -41,12 +67,15 @@ export function QuoteBuilder() {
     );
   }
 
-  // Suma consolidada de subtotales netos. Recalculamos IVA del total para
-  // mantener consistencia con el formato del PricingPanel de cada línea.
-  const subtotalNet = lines.reduce((s, l) => s + l.pricing.subtotalNet, 0);
+  // Suma consolidada de subtotales netos. Usamos el estimado por línea para
+  // que el resumen siga los steppers ± (si nadie ajustó cantidades, coincide
+  // exacto con el snapshot). El IVA se recalcula del total para mantener
+  // consistencia con el formato del PricingPanel de cada línea.
+  const subtotalNet = lines.reduce((s, l) => s + estimatedSubtotalNet(l), 0);
   const iva = subtotalNet * IVA_RATE;
   const totalGross = subtotalNet + iva;
   const totalUnits = lines.reduce((s, l) => s + l.quantity, 0);
+  const hasEstimated = lines.some(isEstimated);
 
   return (
     <div className="mt-10 grid gap-12 lg:mt-12 lg:grid-cols-[1fr_340px] lg:gap-16">
@@ -79,6 +108,14 @@ export function QuoteBuilder() {
             <Row label="Total bruto" value={formatCLP(totalGross)} emphasis />
           </div>
 
+          {hasEstimated && (
+            <p className="mt-3 rounded border border-rpc-info/30 bg-rpc-info/5 px-3 py-2 font-rpc-body text-[11px] normal-case leading-relaxed tracking-normal text-rpc-text/70">
+              Ajustaste cantidades, así que estos montos son estimados. Al
+              enviar, recalculamos cada línea con los descuentos por volumen
+              vigentes y el PDF lleva el precio definitivo.
+            </p>
+          )}
+
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
@@ -87,7 +124,7 @@ export function QuoteBuilder() {
             Solicitar cotización formal
           </button>
           <p className="mt-3 text-center text-[10px] uppercase tracking-[0.18em] text-rpc-text/40">
-            Te enviamos PDF + nos contactamos el mismo día hábil
+            PDF al instante · te contactamos en menos de 24 h hábiles
           </p>
         </div>
       </div>
@@ -136,14 +173,7 @@ function LineRow({ line }: { line: CartLine }) {
 
       <div className="flex items-end justify-between gap-4 sm:flex-col sm:items-end sm:justify-start sm:gap-3">
         <QuantityInline line={line} />
-        <div className="text-right">
-          <p className="font-rpc-heading text-lg font-light text-rpc-text">
-            {formatCLP(line.pricing.totalGross)}
-          </p>
-          <p className="text-[10px] uppercase tracking-[0.18em] text-rpc-text/50">
-            Total con IVA
-          </p>
-        </div>
+        <LinePrice line={line} />
         <button
           type="button"
           onClick={() => removeLine(line.id)}
@@ -157,10 +187,41 @@ function LineRow({ line }: { line: CartLine }) {
   );
 }
 
+/**
+ * Precio de la línea. Si la cantidad cambió después del snapshot (steppers ±),
+ * mostramos el estimado con el último precio unitario conocido y lo marcamos
+ * honesto: el precio definitivo lo recalcula el servidor al enviar (los
+ * descuentos por volumen pueden moverlo).
+ */
+function LinePrice({ line }: { line: CartLine }) {
+  const estimated = isEstimated(line);
+  const displayGross = estimated
+    ? estimatedSubtotalNet(line) * (1 + IVA_RATE)
+    : line.pricing.totalGross;
+
+  return (
+    <div className="text-right">
+      <p className="font-rpc-heading text-lg font-light text-rpc-text">
+        {formatCLP(displayGross)}
+      </p>
+      {estimated ? (
+        <p className="text-[10px] uppercase tracking-[0.18em] text-rpc-info-dark">
+          Estimado · se recotiza al enviar
+        </p>
+      ) : (
+        <p className="text-[10px] uppercase tracking-[0.18em] text-rpc-text/50">
+          Total con IVA
+        </p>
+      )}
+    </div>
+  );
+}
+
 function QuantityInline({ line }: { line: CartLine }) {
-  // ±1 por click (igual que el stepper de la PDP). Nota: no re-calculamos
-  // pricing del lado del browser para no duplicar el engine. Si el cliente
-  // ajusta mucho, vuelve a la PDP. En Fase 5 (server-side) recalculamos.
+  // ±1 por click (igual que el stepper de la PDP). No re-calculamos el
+  // pricing completo en el browser (el producto con su volumePricing no
+  // está en CartLine): mostramos un estimado proporcional vía LinePrice y
+  // el recálculo server-side de submitQuoteAction fija el precio real.
   const dec = () => {
     updateLine(line.id, { quantity: Math.max(1, line.quantity - 1) });
   };

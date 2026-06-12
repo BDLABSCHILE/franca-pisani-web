@@ -6,46 +6,33 @@ import {
   Image,
   StyleSheet,
   pdf,
-  Font,
 } from "@react-pdf/renderer";
 import type { CartLine } from "./storage";
 import { formatCLP, IVA_RATE } from "@/lib/utils/money";
+import { CONTACT } from "@/lib/brand/contacts";
 
 /**
- * Generación del PDF profesional de cotización corporativa.
+ * Generación del PDF de cotización corporativa — Ropa Publicitaria Chile.
  *
  * Stack: @react-pdf/renderer corre server-side, no usa DOM. La salida es un
  * Buffer/Uint8Array que se puede attachear al email o devolver como descarga.
+ *
+ * Identidad: wordmark texto "ROPA PUBLICITARIA CHILE" + rombo coral (shape
+ * simple rotado 45°), paleta RPC (tinta #101418, coral #f07848, celeste
+ * #18c0f0). Tipografía Helvetica nativa de react-pdf (sin fetch de fuentes).
  */
 
-// Mona Sans desde Google Fonts (mismo font que el sitio).
-// React-PDF necesita registrar fuentes explícitamente para usar en el PDF.
-Font.register({
-  family: "Mona Sans",
-  fonts: [
-    {
-      src: "https://fonts.gstatic.com/s/monasans/v8/uYxJTjzdMyZQrl9MhM7yj9rwzwLBHvLE-fbcL.ttf",
-      fontWeight: 300,
-    },
-    {
-      src: "https://fonts.gstatic.com/s/monasans/v8/uYxJTjzdMyZQrl9MhM7yj9rwzwLBHvLE-fbcL.ttf",
-      fontWeight: 400,
-    },
-    {
-      src: "https://fonts.gstatic.com/s/monasans/v8/uYxJTjzdMyZQrl9MhM7yj9rwzwLBHvLE-fbcL.ttf",
-      fontWeight: 600,
-    },
-  ],
-});
-
 const colors = {
-  text: "#2d2a26",
-  textMuted: "#6e6960",
-  border: "#e8e8e1",
+  text: "#101418",
+  textMuted: "#5b6168",
+  border: "#e6e8ea",
   bg: "#ffffff",
-  bgMuted: "#f6f6f3",
-  accent: "#682d2d",
+  bgMuted: "#f6f7f8",
+  accent: "#f07848",
+  info: "#18c0f0",
 } as const;
+
+const SITE_URL = "ropapublicitariachile.cl";
 
 const styles = StyleSheet.create({
   page: {
@@ -60,22 +47,35 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomWidth: 2,
+    borderBottomColor: colors.accent,
     paddingBottom: 16,
     marginBottom: 24,
   },
+  brandMark: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  // Rombo coral del logo: cuadrado rotado 45°.
+  diamond: {
+    width: 11,
+    height: 11,
+    backgroundColor: colors.accent,
+    transform: "rotate(45deg)",
+    marginRight: 4,
+  },
   brand: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 22,
-    letterSpacing: 4,
+    fontSize: 15,
+    letterSpacing: 1.5,
     color: colors.text,
   },
   brandSub: {
     fontSize: 7,
     letterSpacing: 3,
     color: colors.textMuted,
-    marginTop: 4,
+    marginTop: 5,
     textTransform: "uppercase",
   },
   quoteMetaCol: {
@@ -90,6 +90,13 @@ const styles = StyleSheet.create({
   quoteMetaItem: {
     fontSize: 7,
     color: colors.textMuted,
+    marginTop: 2,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  quoteMetaAccent: {
+    fontSize: 7,
+    color: colors.accent,
     marginTop: 2,
     textTransform: "uppercase",
     letterSpacing: 1,
@@ -143,6 +150,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+    backgroundColor: colors.bgMuted,
   },
   tableHeaderCell: {
     fontSize: 7,
@@ -257,7 +265,6 @@ const styles = StyleSheet.create({
 export type QuotePDFInput = {
   quoteNumber: string;
   createdAt: Date;
-  validityDays: number;
   customer: {
     companyName: string;
     rut: string;
@@ -279,34 +286,40 @@ function formatDateLong(d: Date): string {
 export function QuotePDF({
   quoteNumber,
   createdAt,
-  validityDays,
   customer,
   lines,
 }: QuotePDFInput) {
   const subtotalNet = lines.reduce((s, l) => s + l.pricing.subtotalNet, 0);
   const iva = subtotalNet * IVA_RATE;
   const totalGross = subtotalNet + iva;
-  const validUntil = new Date(createdAt);
-  validUntil.setDate(validUntil.getDate() + validityDays);
   const totalUnits = lines.reduce((s, l) => s + l.quantity, 0);
 
   return (
     <Document
-      title={`Cotización ${quoteNumber} · BØLG Corporativo`}
-      author="BØLG Concept"
-      subject="Cotización corporativa BØLG"
+      title={`Cotización ${quoteNumber} · Ropa Publicitaria Chile`}
+      author={CONTACT.razonSocial}
+      subject="Cotización corporativa Ropa Publicitaria Chile"
     >
       <Page size="A4" style={styles.page}>
         {/* Header con marca + datos de la cotización */}
         <View style={styles.brandRow}>
           <View>
-            <Text style={styles.brand}>BØLG</Text>
-            <Text style={styles.brandSub}>Corporativo · Cotización</Text>
+            <View style={styles.brandMark}>
+              <View style={styles.diamond} />
+              <Text style={styles.brand}>ROPA PUBLICITARIA CHILE</Text>
+            </View>
+            <Text style={styles.brandSub}>
+              Vestuario corporativo · Cotización
+            </Text>
           </View>
           <View style={styles.quoteMetaCol}>
             <Text style={styles.quoteNumber}>{quoteNumber}</Text>
-            <Text style={styles.quoteMetaItem}>Emitida {formatDateLong(createdAt)}</Text>
-            <Text style={styles.quoteMetaItem}>Válida hasta {formatDateLong(validUntil)}</Text>
+            <Text style={styles.quoteMetaItem}>
+              Emitida {formatDateLong(createdAt)}
+            </Text>
+            <Text style={styles.quoteMetaAccent}>
+              Referencial · sujeta a confirmación
+            </Text>
           </View>
         </View>
 
@@ -393,34 +406,36 @@ export function QuotePDF({
           </View>
         </View>
 
-        {/* Términos comerciales */}
+        {/* Condiciones comerciales — genéricas del rubro, sin cifras inventadas. */}
         <View style={styles.termsBlock}>
           <Text style={styles.termsTitle}>Condiciones comerciales</Text>
           <View style={styles.termsList}>
             <Text style={styles.termItem}>
-              · Mockup digital del logo aplicado se envía para aprobación antes de producir.
+              · Esta cotización es referencial y será confirmada por nuestro equipo en menos de 24 horas hábiles.
             </Text>
             <Text style={styles.termItem}>
-              · Forma de pago habitual: 50% al confirmar la orden, 50% antes del despacho.
+              · Antes de producir te enviamos el mockup digital con tu logo aplicado, para tu aprobación.
             </Text>
             <Text style={styles.termItem}>
-              · Para productos sin stock inmediato, lead time desde origen ~150 días.
+              · Plazos de entrega según disponibilidad: stock express en Chile o fabricación a medida. El equipo te confirma el plazo exacto.
             </Text>
             <Text style={styles.termItem}>
-              · Despacho a todo Chile vía partner logístico (costo a confirmar según volumen y destino).
+              · Costo y plazo de despacho a confirmar según volumen y destino.
             </Text>
             <Text style={styles.termItem}>
-              · Validez de esta cotización: {validityDays} días desde la fecha de emisión.
+              · Forma de pago y condiciones de facturación se coordinan directamente con nuestro equipo.
             </Text>
             <Text style={styles.termItem}>
-              · Emitimos factura electrónica a nombre de la empresa (necesitamos razón social, RUT y giro).
+              · Emitimos factura electrónica a nombre de tu empresa (necesitamos razón social, RUT y giro).
             </Text>
           </View>
         </View>
 
         {/* Footer fijo */}
         <View style={styles.footer} fixed>
-          <Text style={styles.footerText}>BØLG Concept · corporativo.bolg.cl</Text>
+          <Text style={styles.footerText}>
+            Ropa Publicitaria Chile · {SITE_URL} · {CONTACT.email}
+          </Text>
           <Text
             style={styles.footerText}
             render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`}

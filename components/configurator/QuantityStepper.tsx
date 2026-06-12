@@ -82,7 +82,7 @@ export function QuantityStepper({ value, minQty, onChange, nextBreak }: Props) {
         <button
           type="button"
           onClick={() => onChange(nextBreak.minQty)}
-          className="mt-3 flex w-full items-center justify-between gap-3 rounded-rpc-button border border-rpc-text bg-rpc-image-bg-light px-4 py-3 text-left transition hover:bg-rpc-text hover:text-rpc-button-text"
+          className="mt-3 flex w-full items-center justify-between gap-3 rounded-rpc-button border border-rpc-accent bg-rpc-image-bg-light px-4 py-3 text-left transition hover:bg-rpc-accent hover:text-rpc-button-text"
         >
           <span className="text-xs uppercase tracking-[0.18em]">
             Sube a {nextBreak.minQty} unidades

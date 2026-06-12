@@ -8,7 +8,7 @@ import {
   type CatalogSearchParams,
 } from "@/components/catalog/CatalogFilters";
 import { CatalogFiltersMobile } from "@/components/catalog/CatalogFiltersMobile";
-import Image from "next/image";
+import { LogoBanner } from "@/components/catalog/LogoBanner";
 
 // Catálogo siempre dinámico para reflejar stock real + cambios de metafields
 // sin caché agresiva.
@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Catálogo corporativo",
   description:
-    "Catálogo BØLG para empresas: mochilas, botellas, vestuario y accesorios. Cotiza con tu logo, precios por volumen y stock real.",
+    "Catálogo de Ropa Publicitaria Chile: poleras, polerones, camisas, ropa técnica, jockeys y merchandising. Cotiza con tu logo en bordado, serigrafía, DTF o sublimación.",
 };
 
 export default async function CatalogoPage({
@@ -43,26 +43,29 @@ export default async function CatalogoPage({
   return (
     <div className="mx-auto max-w-7xl px-6 py-6 sm:py-8 lg:px-10 lg:py-12">
       {/*
-        Header minimal: lockup BØLG Corporativo centrado + UNA línea de
-        microcopy abajo. El h1 se mantiene por SEO/a11y pero como texto
-        chico junto al resto de la info (mínimo, despacho).
+        Header compacto: título + una línea de contexto. El aviso de "precios
+        de referencia" del modo demo vive en el header global del sitio —
+        acá no se duplica.
       */}
-      <header className="flex flex-col items-center border-b border-rpc-border pb-6 text-center sm:pb-8">
-        <Image
-          src="/brand/rpc-corporativo-lockup.png"
-          alt="BØLG Corporativo"
-          width={1902}
-          height={936}
-          priority
-          className="h-20 w-auto sm:h-24 lg:h-28"
-        />
-        <h1 className="mt-4 font-rpc-body text-xs normal-case tracking-normal text-rpc-text/70 sm:mt-5 sm:text-sm">
-          Personaliza con tu logo · Mínimo 10 unidades · Despacho a todo Chile
+      <header className="border-b border-rpc-border pb-6 sm:pb-8">
+        <h1 className="text-3xl text-rpc-text sm:text-4xl">
+          Catálogo corporativo
         </h1>
+        <p className="mt-3 max-w-2xl font-rpc-body text-sm normal-case tracking-normal text-rpc-text/70 sm:text-base">
+          Poleras, polerones, camisas, ropa técnica, jockeys y merchandising.
+          Personaliza con tu logo y cotiza sin compromiso — te respondemos en
+          menos de 24 horas.
+        </p>
       </header>
 
-      {/* Mobile: filtros colapsados detrás de botón. Por default vienen
-          los 49 productos visibles desde arriba sin scrolls extra. */}
+      {/* Feature estrella: sube tu logo una vez y todo el catálogo se
+          previsualiza con tu marca. */}
+      <div className="mt-6">
+        <LogoBanner />
+      </div>
+
+      {/* Mobile: filtros colapsados detrás de botón. Por default viene el
+          catálogo completo visible desde arriba sin scrolls extra. */}
       <div className="mt-6 lg:hidden">
         <CatalogFiltersMobile
           active={active}

@@ -1,4 +1,28 @@
-# Changelog — BOLG Corporativo
+# Changelog — RPC Corporativo
+
+## RPC v1 — base brutal (2026-06-12)
+
+**Objetivo:** convertir el kit corporativo base en la web B2B de **Ropa Publicitaria Chile** (Comercial Franca Pisani Ltda.) — fabricantes de vestuario corporativo y merchandising con más de 40 años, modelo dual stock express en Chile + fabricación a medida en Oriente.
+
+### Hecho
+- **Identidad RPC** completa: tokens en `lib/brand/rpc-tokens.ts` + `app/globals.css` (coral `#f07848` para acción, celeste `#18c0f0` informativo, Archivo headings + Inter body), logo del cliente en `public/brand/rpc-logo.webp` y contacto real en `lib/brand/contacts.ts`.
+- **Catálogo demo** con productos mock de las categorías reales (poleras, polerones, polar, camisas, pantalones, jockeys, merchandising) y precios de referencia — `USE_MOCK_PRODUCTS=true` hasta conectar el Shopify del cliente.
+- **Flujo B2B con factor humano**: cotización en línea sin checkout ni pago; el equipo contacta para cerrar (promesa: respuesta en menos de 24 horas).
+- **SEO técnico + infra**:
+  - `app/robots.ts` (allow all + sitemap) y `app/sitemap.ts` (rutas estáticas + fichas de producto vía `listCorporateProducts()`), ambos respetando `NEXT_PUBLIC_SITE_URL` con default `https://ropapublicitariachile.cl`.
+  - Iconos del sitio (`app/icon.png`, `app/apple-icon.png`) con el rombo coral del cliente.
+  - Open Graph placeholder en `public/og/` (1200×630, rombo + wordmark + banda celeste "Cotiza con tu logo") hasta tener arte real.
+  - `README.md` y `CLAUDE.md` reescritos para RPC; comentarios BOLG limpiados en `scripts/` y `lib/shopify/`.
+
+### Pendiente
+- Dominio del cliente apuntado al hosting (deploy).
+- Conexión al Shopify real: credenciales + `npm run setup:shopify` + metafields por producto + `USE_MOCK_PRODUCTS=false`.
+- Cuenta Resend del cliente con dominio verificado para correos reales.
+- Arte OG real (hoy es placeholder generado).
+
+> **Nota:** las entradas siguientes (Fase 0 y Fase 1) son la historia del **kit base BOLG Corporativo** sobre el que se construyó este proyecto. Se conservan como referencia técnica.
+
+---
 
 ## Fase 1 — Landing + Catálogo (2026-05-25)
 

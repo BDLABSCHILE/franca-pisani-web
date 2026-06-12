@@ -129,37 +129,38 @@ export function mapShopifyProductToCorporate(
 }
 
 /**
- * Categoría visible en el catálogo corporativo. Agrupa los productos de BØLG
- * en 3 buckets simples (más usable para B2B que las categorías retail granular):
+ * Categoría visible en el catálogo corporativo. Mapea los productos a las
+ * 6 categorías reales de Ropa Publicitaria Chile:
  *
- *   - Mochilas y Bolsos (mochilas + duffels)
- *   - Botellas
- *   - Accesorios (jockey + billetera + llavero + cualquier otro chico)
+ *   Poleras · Polerones y Polar · Camisas · Pantalones y Ropa Técnica ·
+ *   Jockeys y Gorros · Merchandising
  *
- * Prioriza el handle (consistente entre productos del Shopify de BØLG) y cae
- * al productType de Shopify como último recurso.
+ * Prioriza el prefijo del handle (consistente en el catálogo RPC) y cae al
+ * productType de Shopify como segundo intento. Todo lo que no es vestuario
+ * (bolsas, tazones, artículos promocionales) cae en Merchandising.
  */
 function deriveCategory(productType: string, handle: string): string {
   const h = handle.toLowerCase();
-  if (h.startsWith("mochila-") || h.startsWith("bolso-")) return "Mochilas y Bolsos";
-  if (h.startsWith("botella-")) return "Botellas";
-  if (h.startsWith("mug-") || h.startsWith("taza-") || h.startsWith("tazon-")) {
-    return "Mugs y Tazas";
+  if (h.startsWith("polera-")) return "Poleras";
+  if (h.startsWith("poleron-") || h.startsWith("polar-") || h.startsWith("chaqueta-")) {
+    return "Polerones y Polar";
   }
-  if (h.startsWith("jockey-") || h.startsWith("billetera-") || h.startsWith("llavero-")) {
-    return "Accesorios";
-  }
-  // Fallback: usar productType de Shopify normalizado o "Productos"
+  if (h.startsWith("camisa-")) return "Camisas";
+  if (h.startsWith("pantalon-")) return "Pantalones y Ropa Técnica";
+  if (h.startsWith("jockey-") || h.startsWith("gorro-")) return "Jockeys y Gorros";
+
+  // Fallback: productType de Shopify normalizado.
   const pt = productType.toLowerCase();
-  if (pt.includes("mochila") || pt.includes("bolso")) return "Mochilas y Bolsos";
-  if (pt.includes("botella")) return "Botellas";
-  if (pt.includes("mug") || pt.includes("taza") || pt.includes("tazón")) {
-    return "Mugs y Tazas";
+  if (pt.includes("polera")) return "Poleras";
+  if (pt.includes("polerón") || pt.includes("poleron") || pt.includes("polar") || pt.includes("chaqueta")) {
+    return "Polerones y Polar";
   }
-  if (pt.includes("jockey") || pt.includes("billetera") || pt.includes("llavero")) {
-    return "Accesorios";
+  if (pt.includes("camisa")) return "Camisas";
+  if (pt.includes("pantalón") || pt.includes("pantalon") || pt.includes("ropa técnica") || pt.includes("ropa tecnica")) {
+    return "Pantalones y Ropa Técnica";
   }
-  return productType || "Productos";
+  if (pt.includes("jockey") || pt.includes("gorro")) return "Jockeys y Gorros";
+  return "Merchandising";
 }
 
 function mapVariant(v: RawVariantEdge["node"]): ProductVariant {

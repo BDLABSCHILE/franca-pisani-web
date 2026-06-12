@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CorporateProduct } from "@/lib/shopify/types";
+import { getStoredLogo } from "@/lib/logo/store";
 import { calculateLinePricing } from "@/lib/quote/pricing";
 import { analyzeStock } from "@/lib/quote/stock-analysis";
 import { VariantSelector } from "./VariantSelector";
@@ -38,6 +39,32 @@ export function ProductConfigurator({ product, inventoryByVariantId }: Props) {
   const [requiredDate, setRequiredDate] = useState<string>(defaultRequiredDateIso());
   const [occasion, setOccasion] = useState<string | null>(null);
   const [logo, setLogo] = useState<LogoState>(null);
+
+  // True cuando el logo vino del store global (lib/logo/store.ts) y no de un
+  // upload en esta página — gobierna el aviso "Usando tu logo guardado".
+  const [logoFromStore, setLogoFromStore] = useState(false);
+
+  // Al montar: si el visitante ya subió su logo en otra parte del sitio
+  // (home, otro producto), lo precargamos automáticamente. El estado inicial
+  // de `logo` siempre es null en el primer mount, así que no pisamos nada.
+  useEffect(() => {
+    const stored = getStoredLogo();
+    if (!stored) return;
+    setLogo({
+      // El dataUrl persistido sirve directo como previewUrl para Konva/UI.
+      previewUrl: stored.dataUrl,
+      dataUrl: stored.dataUrl,
+      fileName: stored.fileName,
+      mimeType: stored.mimeType,
+    });
+    setLogoFromStore(true);
+  }, []);
+
+  // Cualquier cambio manual (upload nuevo o quitar) deja de ser "guardado".
+  const handleLogoChange = useCallback((next: LogoState) => {
+    setLogo(next);
+    setLogoFromStore(false);
+  }, []);
 
   // Ref al LivePreview para capturar el mockup compuesto (producto + logo)
   // al momento de agregar la línea al carrito. Ver LivePreviewHandle.
@@ -131,7 +158,11 @@ export function ProductConfigurator({ product, inventoryByVariantId }: Props) {
       <div className="space-y-10">
         {/* Paso 1: sube tu logo. Lo ponemos primero porque el preview live se
             activa apenas subes el archivo y motiva al cliente a explorar. */}
-        <LogoUploader logo={logo} onChange={setLogo} />
+        <LogoUploader
+          logo={logo}
+          onChange={handleLogoChange}
+          fromSavedLogo={logoFromStore}
+        />
 
         {product.variants.length > 0 && (
           <VariantSelector
@@ -176,6 +207,7 @@ export function ProductConfigurator({ product, inventoryByVariantId }: Props) {
           <PricingPanel
             pricing={pricing}
             quantity={quantity}
+            minQty={product.minQty}
             volumePricing={product.volumePricing}
             onJumpToQuantity={setQuantity}
           />

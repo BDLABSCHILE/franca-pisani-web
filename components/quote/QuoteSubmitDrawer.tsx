@@ -145,8 +145,9 @@ export function QuoteSubmitDrawer({
 
             <div className="flex-1 space-y-5 overflow-y-auto px-6 py-6">
               <p className="font-rpc-body text-sm normal-case tracking-normal text-rpc-text/70">
-                Compartenos los datos de tu empresa. Te enviamos el PDF formal por
-                email y nuestro equipo se pone en contacto el mismo día hábil.
+                Compártenos los datos de tu empresa. Te enviamos el PDF por
+                email y nuestro equipo te contacta en menos de 24 horas hábiles
+                para confirmar y coordinar.
               </p>
 
               <Field
@@ -347,9 +348,9 @@ function SuccessView({
       </h2>
 
       <p className="mt-4 max-w-sm font-rpc-body text-sm normal-case tracking-normal text-rpc-text/70">
-        Te enviamos el PDF formal por email. Nuestro equipo comercial revisa el
-        requerimiento y se pone en contacto el mismo día hábil con stock real,
-        lead time confirmado y mockup digital del logo.
+        Te enviamos el PDF por email. Nuestro equipo revisa tu requerimiento y
+        te contacta en menos de 24 horas hábiles para confirmar precios, stock
+        y plazos, y coordinar el mockup con tu logo.
       </p>
 
       {dryRun && (

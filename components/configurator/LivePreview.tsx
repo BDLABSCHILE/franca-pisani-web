@@ -41,6 +41,12 @@ type Props = {
  */
 const CANVAS_SIZE = 900;
 
+/**
+ * Celeste informativo (token rpc-info de globals.css). Konva no puede leer
+ * CSS variables, así que duplicamos el hex aquí con referencia al token.
+ */
+const RPC_INFO_HEX = "#18c0f0";
+
 type LogoBox = {
   x: number;
   y: number;
@@ -48,6 +54,8 @@ type LogoBox = {
   height: number;
   rotation: number;
 };
+
+type Rect = { x: number; y: number; width: number; height: number };
 
 function useHtmlImage(src: string | null): HTMLImageElement | null {
   const [img, setImg] = useState<HTMLImageElement | null>(null);
@@ -67,14 +75,97 @@ function useHtmlImage(src: string | null): HTMLImageElement | null {
   return img;
 }
 
-function initialLogoBox(logoImg: HTMLImageElement): LogoBox {
-  const target = CANVAS_SIZE * 0.25;
-  const logoAspect = logoImg.width / logoImg.height;
-  const width = logoAspect >= 1 ? target : target * logoAspect;
-  const height = logoAspect >= 1 ? target / logoAspect : target;
+function clampValue(v: number, min: number, max: number): number {
+  return Math.min(Math.max(v, min), Math.max(min, max));
+}
+
+/** Bounding box del polígono del área imprimible (en px de la imagen original). */
+function polygonBounds(poly: Array<[number, number]>): Rect | null {
+  if (poly.length === 0) return null;
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const [px, py] of poly) {
+    minX = Math.min(minX, px);
+    minY = Math.min(minY, py);
+    maxX = Math.max(maxX, px);
+    maxY = Math.max(maxY, py);
+  }
+  if (maxX <= minX || maxY <= minY) return null;
+  return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+}
+
+/**
+ * Re-encaja un LogoBox dentro del área imprimible: si quedó más grande que el
+ * área (o que el máximo en cm), lo achica manteniendo aspecto; luego ajusta
+ * x/y para que no se salga. Se usa al cambiar de zona/imagen y como red de
+ * seguridad después de drag/transform.
+ */
+function clampBoxToRect(
+  box: LogoBox,
+  rect: Rect,
+  maxPx: { w: number; h: number } | null,
+): LogoBox {
+  const aspect = box.width / box.height || 1;
+  let width = box.width;
+  let height = box.height;
+  const maxW = Math.min(rect.width, maxPx?.w ?? Infinity);
+  const maxH = Math.min(rect.height, maxPx?.h ?? Infinity);
+  if (width > maxW) {
+    width = maxW;
+    height = width / aspect;
+  }
+  if (height > maxH) {
+    height = maxH;
+    width = height * aspect;
+  }
   return {
-    x: (CANVAS_SIZE - width) / 2,
-    y: (CANVAS_SIZE - height) / 2,
+    ...box,
+    width,
+    height,
+    x: clampValue(box.x, rect.x, rect.x + rect.width - width),
+    y: clampValue(box.y, rect.y, rect.y + rect.height - height),
+  };
+}
+
+/**
+ * Posición inicial del logo: centrado dentro del área imprimible, al 70% de
+ * su tamaño (sin pasar el máximo en cm) para que caiga cómodo dentro de la
+ * guía y el cliente lo ajuste desde ahí. Sin área conocida, cae al centro
+ * del canvas con el tamaño histórico (25% del stage).
+ */
+function initialLogoBox(
+  logoImg: HTMLImageElement,
+  rect: Rect | null,
+  maxPx: { w: number; h: number } | null,
+): LogoBox {
+  const aspect = logoImg.width / logoImg.height || 1;
+
+  if (!rect) {
+    const target = CANVAS_SIZE * 0.25;
+    const width = aspect >= 1 ? target : target * aspect;
+    const height = aspect >= 1 ? target / aspect : target;
+    return {
+      x: (CANVAS_SIZE - width) / 2,
+      y: (CANVAS_SIZE - height) / 2,
+      width,
+      height,
+      rotation: 0,
+    };
+  }
+
+  const targetW = Math.min(rect.width * 0.7, maxPx?.w ?? Infinity);
+  const targetH = Math.min(rect.height * 0.7, maxPx?.h ?? Infinity);
+  let width = targetW;
+  let height = width / aspect;
+  if (height > targetH) {
+    height = targetH;
+    width = height * aspect;
+  }
+  return {
+    x: rect.x + (rect.width - width) / 2,
+    y: rect.y + (rect.height - height) / 2,
     width,
     height,
     rotation: 0,
@@ -133,13 +224,62 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
   const logoRef = useRef<Konva.Image | null>(null);
   const transformerRef = useRef<Konva.Transformer | null>(null);
 
+  // Guía del área imprimible: visible mientras el cliente arrastra o
+  // transforma el logo, se desvanece (CSS transition) al soltar.
+  const [isAdjusting, setIsAdjusting] = useState(false);
+
+  // Tamaño en cm "en vivo" mientras se transforma (logoBox solo se commitea
+  // al soltar; esto alimenta el badge flotante durante el gesto).
+  const [liveCm, setLiveCm] = useState<{ w: string; h: string } | null>(null);
+
+  /**
+   * Área imprimible proyectada al sistema del Stage (900×900). El polígono
+   * viene en píxeles de la imagen original (1200×1200 en los mocks), así que
+   * aplicamos la misma matemática object-contain que usa drawContained y el
+   * <img> visible. Cuando lleguen las fotos reales del cliente se calibran
+   * los polígonos por producto.
+   */
+  const printRect = useMemo<Rect | null>(() => {
+    if (!area) return null;
+    const bounds = polygonBounds(area.areaPolygon);
+    if (!bounds) return null;
+    const naturalW = productImg?.naturalWidth || productImage.width || CANVAS_SIZE;
+    const naturalH = productImg?.naturalHeight || productImage.height || CANVAS_SIZE;
+    const s = Math.min(CANVAS_SIZE / naturalW, CANVAS_SIZE / naturalH);
+    const dx = (CANVAS_SIZE - naturalW * s) / 2;
+    const dy = (CANVAS_SIZE - naturalH * s) / 2;
+    return {
+      x: bounds.x * s + dx,
+      y: bounds.y * s + dy,
+      width: bounds.width * s,
+      height: bounds.height * s,
+    };
+  }, [area, productImg, productImage]);
+
+  /** Tamaño máximo del logo en px del Stage según los cm máximos del área. */
+  const maxLogoPx = useMemo(() => {
+    if (!area) return null;
+    return { w: area.maxWidthCm * area.pxPerCm, h: area.maxHeightCm * area.pxPerCm };
+  }, [area]);
+
+  // Coloca el logo al cargarlo o al cambiar de zona; si solo cambió la imagen
+  // de fondo (galería), re-encaja la posición actual sin resetear el trabajo
+  // que el cliente ya hizo.
+  const placedKeyRef = useRef<string | null>(null);
   useEffect(() => {
-    if (logoImg) {
-      setLogoBox(initialLogoBox(logoImg));
-    } else {
+    if (!logoImg) {
       setLogoBox(null);
+      placedKeyRef.current = null;
+      return;
     }
-  }, [logoImg]);
+    const key = `${logoImg.src}|${area?.id ?? "none"}`;
+    if (placedKeyRef.current !== key) {
+      placedKeyRef.current = key;
+      setLogoBox(initialLogoBox(logoImg, printRect, maxLogoPx));
+    } else if (printRect) {
+      setLogoBox((box) => (box ? clampBoxToRect(box, printRect, maxLogoPx) : box));
+    }
+  }, [logoImg, area, printRect, maxLogoPx]);
 
   useEffect(() => {
     if (transformerRef.current && logoRef.current) {
@@ -158,8 +298,47 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
         }
       : null;
 
+  // Lo que muestra el badge: el tamaño en vivo durante el gesto, o el
+  // commiteado en reposo.
+  const shownCm = liveCm ?? sizeCm;
+
   const resetLogo = () => {
-    if (logoImg) setLogoBox(initialLogoBox(logoImg));
+    if (logoImg) setLogoBox(initialLogoBox(logoImg, printRect, maxLogoPx));
+  };
+
+  /**
+   * Límite de arrastre: mantiene el logo dentro del rect del área imprimible.
+   * Konva entrega/espera la posición en coordenadas absolutas (ya escaladas
+   * por el Stage), por eso multiplicamos por `scale`. Con rotación usamos el
+   * rect sin rotar como aproximación — suficiente para logos corporativos.
+   */
+  const dragBound = (pos: Konva.Vector2d): Konva.Vector2d => {
+    if (!printRect) return pos;
+    const node = logoRef.current;
+    const w = (node?.width() ?? logoBox?.width ?? 0) * scale;
+    const h = (node?.height() ?? logoBox?.height ?? 0) * scale;
+    const minX = printRect.x * scale;
+    const maxX = (printRect.x + printRect.width) * scale - w;
+    const minY = printRect.y * scale;
+    const maxY = (printRect.y + printRect.height) * scale - h;
+    return {
+      x: clampValue(pos.x, minX, maxX),
+      y: clampValue(pos.y, minY, maxY),
+    };
+  };
+
+  const updateLiveCm = () => {
+    const node = logoRef.current;
+    if (!node || !area) return;
+    setLiveCm({
+      w: ((node.width() * node.scaleX()) / area.pxPerCm).toFixed(1),
+      h: ((node.height() * node.scaleY()) / area.pxPerCm).toFixed(1),
+    });
+  };
+
+  const endAdjusting = () => {
+    setIsAdjusting(false);
+    setLiveCm(null);
   };
 
   // Captura del mockup compuesto (producto + logo) a un canvas temporal y
@@ -228,6 +407,24 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
           draggable={false}
         />
 
+        {/* Guía del área imprimible: rect punteado celeste que aparece
+            mientras el cliente arrastra/transforma y se desvanece al soltar. */}
+        {printRect && (
+          <div
+            aria-hidden
+            className={cn(
+              "pointer-events-none absolute rounded-[4px] border-2 border-dashed border-rpc-info transition-opacity duration-500",
+              isAdjusting && logoImg ? "opacity-40" : "opacity-0",
+            )}
+            style={{
+              left: `${(printRect.x / CANVAS_SIZE) * 100}%`,
+              top: `${(printRect.y / CANVAS_SIZE) * 100}%`,
+              width: `${(printRect.width / CANVAS_SIZE) * 100}%`,
+              height: `${(printRect.height / CANVAS_SIZE) * 100}%`,
+            }}
+          />
+        )}
+
         <Stage
           width={containerSize}
           height={containerSize}
@@ -249,27 +446,35 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
                   height={logoBox.height}
                   rotation={logoBox.rotation}
                   draggable
+                  dragBoundFunc={dragBound}
+                  onDragStart={() => setIsAdjusting(true)}
                   onDragEnd={(e) => {
-                    setLogoBox({
-                      ...logoBox,
-                      x: e.target.x(),
-                      y: e.target.y(),
-                    });
+                    endAdjusting();
+                    const moved = { ...logoBox, x: e.target.x(), y: e.target.y() };
+                    setLogoBox(
+                      printRect ? clampBoxToRect(moved, printRect, maxLogoPx) : moved,
+                    );
                   }}
+                  onTransformStart={() => setIsAdjusting(true)}
+                  onTransform={updateLiveCm}
                   onTransformEnd={() => {
+                    endAdjusting();
                     const node = logoRef.current;
                     if (!node) return;
                     const scaleX = node.scaleX();
                     const scaleY = node.scaleY();
                     node.scaleX(1);
                     node.scaleY(1);
-                    setLogoBox({
+                    const next: LogoBox = {
                       x: node.x(),
                       y: node.y(),
                       width: Math.max(20, node.width() * scaleX),
                       height: Math.max(20, node.height() * scaleY),
                       rotation: node.rotation(),
-                    });
+                    };
+                    setLogoBox(
+                      printRect ? clampBoxToRect(next, printRect, maxLogoPx) : next,
+                    );
                   }}
                 />
                 <Transformer
@@ -277,14 +482,29 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
                     transformerRef.current = node;
                   }}
                   rotateEnabled
+                  borderStroke={RPC_INFO_HEX}
+                  anchorStroke={RPC_INFO_HEX}
+                  anchorFill="#ffffff"
+                  anchorSize={11}
+                  anchorCornerRadius={3}
                   enabledAnchors={[
                     "top-left",
                     "top-right",
                     "bottom-left",
                     "bottom-right",
                   ]}
-                  boundBoxFunc={(_, newBox) => {
-                    if (newBox.width < 20 || newBox.height < 20) return _;
+                  boundBoxFunc={(oldBox, newBox) => {
+                    // Mínimo legible para no colapsar el logo a 0.
+                    if (newBox.width < 20 || newBox.height < 20) return oldBox;
+                    // Máximo según los cm imprimibles del área (px absolutos
+                    // del viewport = px del Stage × scale del container).
+                    if (maxLogoPx) {
+                      const maxW = maxLogoPx.w * scale;
+                      const maxH = maxLogoPx.h * scale;
+                      if (Math.abs(newBox.width) > maxW || Math.abs(newBox.height) > maxH) {
+                        return oldBox;
+                      }
+                    }
                     return newBox;
                   }}
                 />
@@ -292,6 +512,21 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
             )}
           </Layer>
         </Stage>
+
+        {/* Badge flotante con el tamaño real del logo en cm, en vivo. */}
+        {shownCm && area && logoImg && (
+          <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-rpc-button border border-rpc-info/50 bg-rpc-bg/90 px-3 py-1.5 backdrop-blur">
+            <p className="font-rpc-body text-xs tracking-normal text-rpc-text">
+              Tu logo:{" "}
+              <span className="font-semibold">
+                {shownCm.w} × {shownCm.h} cm
+              </span>
+              <span className="text-rpc-text/55">
+                {" "}— máx {area.maxWidthCm} × {area.maxHeightCm} cm
+              </span>
+            </p>
+          </div>
+        )}
 
         {!logoImg && (
           <div className="pointer-events-none absolute inset-x-0 bottom-4 flex justify-center">
@@ -339,18 +574,14 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
         </div>
       )}
 
-      {logoBox && sizeCm && (
-        <div
-          className={cn(
-            "flex flex-wrap items-center justify-between gap-3 rounded-rpc-card border border-rpc-border bg-rpc-bg px-4 py-3",
-          )}
-        >
+      {logoBox && area && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-rpc-card border border-rpc-border bg-rpc-bg px-4 py-3">
           <div className="flex items-baseline gap-3">
             <span className="text-[10px] uppercase tracking-[0.18em] text-rpc-text/60">
-              Tamaño de tu logo
+              Zona: {area.label}
             </span>
-            <span className="font-rpc-heading text-base font-light text-rpc-text">
-              {sizeCm.w} × {sizeCm.h} cm
+            <span className="font-rpc-body text-xs tracking-normal text-rpc-text/55">
+              imprime hasta {area.maxWidthCm} × {area.maxHeightCm} cm
             </span>
           </div>
 

@@ -13,11 +13,13 @@ export default function CotizadorPage() {
           Tu cotización
         </p>
         <h1 className="mt-3 text-2xl font-light leading-[1.1] sm:mt-4 sm:text-3xl lg:text-5xl">
-          Carrito de productos corporativos.
+          Arma tu pedido, nosotros lo cerramos contigo.
         </h1>
         <p className="mt-3 font-rpc-body text-sm normal-case tracking-normal text-rpc-text/70 sm:mt-4 sm:text-base">
-          Revisa, ajusta cantidades y envíanos la cotización. Te respondemos
-          el mismo día hábil con la propuesta formal en PDF.
+          Revisa tu selección, ajusta cantidades y envíanos la cotización.
+          Recibes el PDF al instante y te contactamos en menos de 24 horas
+          hábiles para confirmar precios, stock y plazos — aquí no hay checkout:
+          el cierre lo hacemos persona a persona.
         </p>
       </header>
 

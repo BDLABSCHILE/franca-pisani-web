@@ -3,7 +3,8 @@ import type { CartLine } from "@/lib/quote/storage";
 import { formatCLP, IVA_RATE } from "@/lib/utils/money";
 
 /**
- * Notificación interna al equipo BØLG cuando entra una nueva cotización.
+ * Notificación interna al equipo comercial de Ropa Publicitaria Chile
+ * cuando entra una nueva cotización.
  *
  * Optimizado para acción: contacto del cliente arriba, tabla de productos
  * con técnica+zona+fecha objetivo, total bruto destacado. El PDF formal va
@@ -27,13 +28,13 @@ export type QuoteToSalesProps = {
 };
 
 const palette = {
-  text: "#2d2a26",
-  textMuted: "#6e6960",
-  border: "#e8e8e1",
+  text: "#101418",
+  textMuted: "#5b6168",
+  border: "#e6e8ea",
   bg: "#ffffff",
-  bgMuted: "#f6f6f3",
-  accent: "#682d2d",
-  highlight: "#fff8e1",
+  bgMuted: "#f6f7f8",
+  accent: "#f07848",
+  highlight: "#fdf0e9",
 };
 
 const fontStack = "'Helvetica Neue', Helvetica, Arial, sans-serif";
@@ -494,7 +495,8 @@ export function QuoteToSales({
                             color: palette.textMuted,
                           }}
                         >
-                          Generado automáticamente desde corporativo.bolg.cl
+                          Generado automáticamente desde el cotizador de
+                          ropapublicitariachile.cl
                         </p>
                       </td>
                     </tr>

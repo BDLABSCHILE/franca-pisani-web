@@ -3,13 +3,14 @@
 import { z } from "zod";
 import { Resend } from "resend";
 import { ContactInquiry } from "@/emails/ContactInquiry";
+import { CONTACT } from "@/lib/brand/contacts";
 
 /**
  * Server Action del formulario de contacto general.
  *
  * Diferente del flujo de cotización: acá no hay PDF ni carrito — sólo un
- * mensaje libre del usuario al equipo BØLG. Reply-to apunta al cliente,
- * así un "Responder" desde Gmail va directo a él.
+ * mensaje libre del usuario al equipo de Ropa Publicitaria Chile. Reply-to
+ * apunta al cliente, así un "Responder" desde Gmail va directo a él.
  *
  * Misma estrategia dry-run que submitQuoteAction: sin RESEND_API_KEY,
  * loggea y devuelve éxito en vez de fallar.
@@ -39,10 +40,11 @@ export type ContactSubmitResult =
   | { ok: false; errors: Record<string, string>; formError?: string };
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
+// Buzones del cliente, overrideables por env var sin tocar código.
 const RESEND_FROM_EMAIL =
-  process.env.RESEND_FROM_EMAIL || "benjamin@bolg.cl";
+  process.env.RESEND_FROM_EMAIL || "cotizaciones@ropapublicitariachile.cl";
 const RESEND_INTERNAL_EMAIL =
-  process.env.RESEND_INTERNAL_EMAIL || "benjamin@bolg.cl";
+  process.env.RESEND_INTERNAL_EMAIL || CONTACT.email;
 
 export async function submitContactAction(
   _prevState: ContactSubmitResult | null,
@@ -83,7 +85,7 @@ export async function submitContactAction(
 
   try {
     const result = await resend.emails.send({
-      from: `BØLG Contacto <${RESEND_FROM_EMAIL}>`,
+      from: `Ropa Publicitaria Chile <${RESEND_FROM_EMAIL}>`,
       to: RESEND_INTERNAL_EMAIL,
       replyTo: data.email,
       subject: `[Contacto] ${data.name}${data.company ? ` · ${data.company}` : ""}`,
@@ -103,7 +105,7 @@ export async function submitContactAction(
         ok: false,
         errors: {},
         formError:
-          "No pudimos enviar el mensaje. Inténtalo de nuevo o escríbenos directo a benjamin@bolg.cl.",
+          `No pudimos enviar el mensaje. Inténtalo de nuevo o escríbenos directo a ${CONTACT.email}.`,
       };
     }
   } catch (err) {
@@ -112,7 +114,7 @@ export async function submitContactAction(
       ok: false,
       errors: {},
       formError:
-        "Hubo un error al enviar. Por favor escríbenos directo a benjamin@bolg.cl.",
+        `Hubo un error al enviar. Por favor escríbenos directo a ${CONTACT.email}.`,
     };
   }
 

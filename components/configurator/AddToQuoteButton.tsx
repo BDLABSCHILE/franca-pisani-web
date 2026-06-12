@@ -103,7 +103,7 @@ export function AddToQuoteButton({
         </div>
         <Link
           href="/cotizador"
-          className="flex w-full items-center justify-center gap-2 rounded-rpc-button border border-rpc-text px-6 py-4 text-xs uppercase tracking-[0.2em] text-rpc-text transition hover:bg-rpc-text hover:text-rpc-button-text"
+          className="flex w-full items-center justify-center gap-2 rounded-rpc-button border border-rpc-accent px-6 py-4 text-xs uppercase tracking-[0.2em] text-rpc-text transition hover:bg-rpc-accent hover:text-rpc-button-text"
         >
           Ver cotización
           <span aria-hidden>→</span>
@@ -117,10 +117,10 @@ export function AddToQuoteButton({
       type="button"
       onClick={handle}
       disabled={disabled}
-      className="flex w-full items-center justify-between gap-3 rounded-rpc-button bg-rpc-button px-6 py-4 text-rpc-button-text transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+      className="flex w-full items-center justify-between gap-3 rounded-rpc-button bg-rpc-accent px-6 py-4 text-rpc-button-text transition hover:bg-rpc-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
     >
       <span className="text-xs uppercase tracking-[0.2em]">
-        {state === "adding" ? "Agregando…" : "Agregar a cotización"}
+        {state === "adding" ? "Agregando…" : "Agregar a la cotización"}
       </span>
       {pricing && (
         <span className="font-rpc-body text-xs tracking-normal opacity-90">

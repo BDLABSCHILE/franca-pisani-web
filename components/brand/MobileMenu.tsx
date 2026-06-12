@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { CONTACT_LINKS } from "@/lib/brand/contacts";
 import { cn } from "@/lib/utils/cn";
 
 type NavLink = { href: string; label: string };
@@ -11,7 +12,7 @@ type NavLink = { href: string; label: string };
 const NAV_LINKS: NavLink[] = [
   { href: "/catalogo", label: "Catálogo" },
   { href: "/como-funciona", label: "Cómo funciona" },
-  { href: "/casos-de-exito", label: "Casos de éxito" },
+  { href: "/casos-de-exito", label: "Clientes" },
   { href: "/contacto", label: "Contacto" },
 ];
 
@@ -54,7 +55,7 @@ export function MobileMenu() {
   // Drawer renderizado en un portal a document.body. El `<header>` padre tiene
   // backdrop-blur, lo cual en CSS crea un nuevo containing block para los
   // descendants con position:fixed — eso hacía que `fixed inset-0` quedara
-  // recortado al área del header (64px) en vez de cubrir todo el viewport.
+  // recortado al área del header en vez de cubrir todo el viewport.
   // El portal saca el drawer fuera de ese ancestor y restaura el comportamiento.
   const drawer = (
     <div
@@ -80,61 +81,63 @@ export function MobileMenu() {
           open ? "translate-x-0" : "translate-x-full",
         )}
       >
-          <header className="flex items-center justify-between border-b border-rpc-border px-6 py-5">
-            <span className="font-rpc-heading text-xs uppercase tracking-[0.25em] text-rpc-text/60">
-              Menú
-            </span>
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              aria-label="Cerrar menú"
-              className="flex h-10 w-10 items-center justify-center rounded-rpc-button text-rpc-text hover:bg-rpc-image-bg-light"
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
-                <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.5" />
-              </svg>
-            </button>
-          </header>
+        <header className="flex items-center justify-between border-b border-rpc-border px-6 py-5">
+          <span className="font-rpc-heading text-sm font-bold text-rpc-text/60">
+            Menú
+          </span>
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            aria-label="Cerrar menú"
+            className="flex h-10 w-10 items-center justify-center rounded-rpc-button text-rpc-text hover:bg-rpc-image-bg-light"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+              <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.5" />
+            </svg>
+          </button>
+        </header>
 
-          <nav className="flex flex-1 flex-col gap-1 px-6 py-8">
-            {NAV_LINKS.map((link) => {
-              const isActive =
-                link.href === pathname ||
-                (link.href !== "/" && pathname.startsWith(link.href));
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href as never}
-                  className={cn(
-                    "block py-3 font-rpc-heading text-base uppercase tracking-[0.18em] transition",
-                    isActive
-                      ? "text-rpc-text"
-                      : "text-rpc-text/60 hover:text-rpc-text",
-                  )}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-          </nav>
+        <nav className="flex flex-1 flex-col gap-1 px-6 py-8">
+          {NAV_LINKS.map((link) => {
+            const isActive =
+              link.href === pathname ||
+              (link.href !== "/" && pathname.startsWith(link.href));
+            return (
+              <Link
+                key={link.href}
+                href={link.href as never}
+                className={cn(
+                  "block py-3 font-rpc-heading text-xl font-bold tracking-tight transition",
+                  isActive
+                    ? "text-rpc-text"
+                    : "text-rpc-text/60 hover:text-rpc-text",
+                )}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+        </nav>
 
-          {/* CTAs grandes al final del drawer */}
-          <div className="space-y-3 border-t border-rpc-border px-6 py-6">
-            <Link
-              href="/catalogo"
-              className="flex w-full items-center justify-center rounded-rpc-button bg-rpc-button px-6 py-4 text-xs uppercase tracking-[0.2em] text-rpc-button-text transition hover:opacity-90"
-            >
-              Ver catálogo
-            </Link>
-            <Link
-              href="/contacto"
-              className="flex w-full items-center justify-center rounded-rpc-button border border-rpc-text px-6 py-4 text-xs uppercase tracking-[0.2em] text-rpc-text transition hover:bg-rpc-text hover:text-rpc-button-text"
-            >
-              Hablar con un asesor
-            </Link>
-          </div>
+        {/* CTAs grandes al final del drawer */}
+        <div className="space-y-3 border-t border-rpc-border px-6 py-6">
+          <Link
+            href="/catalogo"
+            className="flex w-full items-center justify-center rounded-rpc-button bg-rpc-accent px-6 py-4 text-sm font-semibold text-white transition hover:bg-rpc-accent-dark"
+          >
+            Cotizar
+          </Link>
+          <a
+            href={CONTACT_LINKS.whatsapp}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="flex w-full items-center justify-center rounded-rpc-button border border-rpc-text px-6 py-4 text-sm font-semibold text-rpc-text transition hover:bg-rpc-text hover:text-white"
+          >
+            Escríbenos por WhatsApp
+          </a>
         </div>
       </div>
+    </div>
   );
 
   return (
