@@ -131,10 +131,10 @@ Se agregaron **22 logos oficiales** al muro "Confían en nosotros", descargados 
 UC, Bosca y Viña Santa Carolina desde el sitio oficial de cada marca). Se
 muestran en escala de grises y pasan a color al hover.
 
+**Confirmado:**
+- **Bosca** → es **bosca.cl (calefacción/estufas)**, confirmado por la marca. Logo correcto. ✅
+
 **A confirmar con la marca:**
-- **Bosca** → usé el logo de **bosca.cl (calefacción/estufas)**. El brief sugería
-  "marroquinería/cuero", que sería otra empresa (bosca.com, EE.UU.). **Confirmar
-  cuál Bosca es el cliente real** y, si es otro, enviar el logo correcto.
 - **The Grange School** → su sitio bloquea la descarga automática (anti-bot), así
   que aparece como **texto**. Enviar el archivo del logo para incorporarlo.
 - **Facultad de Medicina UC** usa el **escudo institucional UC** (no hay marca
