@@ -144,6 +144,7 @@ function deriveCategory(productType: string, handle: string): string {
   if (h.startsWith("polera-")) return "Poleras";
   if (h.startsWith("poleron-") || h.startsWith("polar-")) return "Polerones y Polar";
   if (h.startsWith("camisa-") || h.startsWith("blusa-")) return "Camisas y Blusas";
+  if (h.startsWith("pantalon-")) return "Pantalones";
   if (h.startsWith("softshell-") || h.startsWith("cortaviento")) return "Ropa Técnica y Cortavientos";
   if (h.startsWith("jockey") || h.startsWith("gorro-") || h.startsWith("bucket") || h.startsWith("bandana")) {
     return "Jockeys, Gorros y Accesorios";
@@ -157,6 +158,7 @@ function deriveCategory(productType: string, handle: string): string {
   if (pt.includes("polera")) return "Poleras";
   if (pt.includes("polerón") || pt.includes("poleron") || pt.includes("polar")) return "Polerones y Polar";
   if (pt.includes("camisa") || pt.includes("blusa")) return "Camisas y Blusas";
+  if (pt.includes("pantalón") || pt.includes("pantalon") || pt.includes("docker") || pt.includes("cargo")) return "Pantalones";
   if (pt.includes("softshell") || pt.includes("cortaviento") || pt.includes("ropa técnica") || pt.includes("ropa tecnica")) {
     return "Ropa Técnica y Cortavientos";
   }

@@ -18,6 +18,7 @@ const CATEGORIES = [
   "Poleras",
   "Polerones y Polar",
   "Camisas y Blusas",
+  "Pantalones",
   "Ropa Técnica y Cortavientos",
   "Jockeys, Gorros y Accesorios",
   "Delantales y Uniformes",

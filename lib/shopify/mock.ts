@@ -558,6 +558,37 @@ export const mockCorporateProducts: CorporateProduct[] = [
     colors: ["Negro", "Rojo", "Blanco", "Café", "Verde"],
     priceHigh: 10990, priceLow: 6990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_DELANTAL,
   }),
+
+  // === Pantalones =========================================================
+  // Levantamiento del 2026-06-22: tres modelos. Categoría "Otro" en el formulario;
+  // en el sitio la llamamos "Pantalones" para que tenga sentido al usuario.
+  product({
+    key: "PCARGOG", handle: "pantalon-cargo-gabardina",
+    title: "Pantalón Cargo Gabardina", category: "Pantalones", catTag: "pantalones",
+    intro: "Pantalón cargo en gabardina, resistente y prolijo para faena, terreno y staff. Bolsillos laterales reforzados con amplia capacidad.",
+    material: "Gabardina", tallas: "Cintura 38 a 58", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 8,
+    nota: "Versión hombre y mujer · opción sin logo disponible",
+    colors: ["Beige", "Negro", "Azul marino", "Gris"],
+    priceHigh: 16990, priceLow: 13990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ],
+  }),
+  product({
+    key: "PDOCKER", handle: "pantalon-docker-gabardina",
+    title: "Pantalón Recto Tipo Docker", category: "Pantalones", catTag: "pantalones",
+    intro: "Pantalón gabardina de corte recto tipo docker, para uniforme formal/casual. Calce limpio y resistente al uso diario.",
+    material: "Gabardina", tallas: "Cintura 38 a 58", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 8,
+    nota: "Versión hombre y mujer (calce distinto) · opción sin logo disponible",
+    colors: ["Beige", "Negro", "Gris", "Azul marino"],
+    priceHigh: 16990, priceLow: 13990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ],
+  }),
+  product({
+    key: "PPOPLIN", handle: "pantalon-poplin-cargo",
+    title: "Pantalón Cargo Poplin", category: "Pantalones", catTag: "pantalones",
+    intro: "Pantalón cargo en poplin: más liviano y suave que la gabardina, ideal para climas templados y movilidad. Corte unisex moderno.",
+    material: "Poplin", tallas: "S a 2XL", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 6,
+    nota: "Modelo unisex",
+    colors: ["Azul marino", "Gris", "Negro"],
+    priceHigh: 13900, priceLow: 8990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ],
+  }),
 ];
 
 export function mockProductByHandle(handle: string): CorporateProduct | null {
