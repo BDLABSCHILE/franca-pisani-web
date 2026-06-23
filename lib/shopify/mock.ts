@@ -182,9 +182,9 @@ function specsFromColors(prefix: string, colors: string[]): VariantSpec[] {
 }
 
 /**
- * Tabla de descuentos por volumen derivada del RANGO de precio por unidad
- * (tope/piso) que entregó la clienta + "sobre 50 baja harto el precio".
- * Precios netos de referencia hasta cerrar la cotización.
+ * Tabla de descuentos por volumen derivada del RANGO (tope/piso) cuando
+ * todavía no tenemos los tramos exactos del cliente. Se usa como fallback en
+ * productos cuyos precios reales aún no llegaron.
  */
 function rangePricing(high: number, low: number) {
   const r10 = (n: number) => Math.round(n / 10) * 10;
@@ -194,6 +194,17 @@ function rangePricing(high: number, low: number) {
     { minQty: 50, unitPriceNet: r10(high * 0.25 + low * 0.75) },
     { minQty: 100, unitPriceNet: low },
   ];
+}
+
+/**
+ * Tabla EXACTA de tramos por cantidad entregada por la marca (matriz devuelta
+ * 2026-06-23). Acepta un objeto con las cantidades que la marca cotizó; las
+ * que vienen `null` se omiten (la marca solo cotizó hasta 250u, no 500/1000).
+ */
+function tramos(t: { 10?: number; 25?: number; 50?: number; 100?: number; 250?: number; 500?: number; 1000?: number }) {
+  return ([10, 25, 50, 100, 250, 500, 1000] as const)
+    .filter((q) => t[q] !== undefined)
+    .map((q) => ({ minQty: q, unitPriceNet: t[q]! }));
 }
 
 function fichaHtml(
@@ -225,8 +236,11 @@ type ProductInput = {
   leadDays: number;
   modalidad: "Stock express" | "Fabricación a medida";
   colors: string[];
-  priceHigh: number;
-  priceLow: number;
+  /** Tramos REALES entregados por la marca. Si vienen, ganan. */
+  pricing?: ReturnType<typeof tramos>;
+  /** Fallback cuando todavía no llegan los tramos reales: tope y piso del rango. */
+  priceHigh?: number;
+  priceLow?: number;
   techniques: PrintTechnique[];
   areas: PrintArea[];
   minimo?: number;
@@ -237,6 +251,19 @@ type ProductInput = {
 function product(o: ProductInput): CorporateProduct {
   const minimo = o.minimo ?? 10;
   const modalidadTag = o.modalidad === "Fabricación a medida" ? "fabricacion" : "stock-express";
+
+  const volumePricing =
+    o.pricing && o.pricing.length > 0
+      ? o.pricing
+      : o.priceHigh !== undefined && o.priceLow !== undefined
+        ? rangePricing(o.priceHigh, o.priceLow)
+        : (() => {
+            throw new Error(`Producto ${o.handle} sin pricing ni rango.`);
+          })();
+
+  // Precio retail de la variante = primer tramo (el más caro, cantidad mínima).
+  const retailClp = volumePricing[0]!.unitPriceNet;
+
   return {
     id: `rpc_${o.key.toLowerCase()}`,
     handle: o.handle,
@@ -254,11 +281,11 @@ function product(o: ProductInput): CorporateProduct {
     }),
     featuredImage: localImage(o.handle, o.title),
     images: [localImage(o.handle, o.title)],
-    variants: makeVariants(o.key, o.priceHigh, specsFromColors(o.key, o.colors), o.handle),
+    variants: makeVariants(o.key, retailClp, specsFromColors(o.key, o.colors), o.handle),
     minQty: minimo,
     leadTimeDaysReorder: o.leadDays,
     baseCostUsd: o.baseCostUsd ?? 6,
-    volumePricing: rangePricing(o.priceHigh, o.priceLow),
+    volumePricing,
     printAreas: o.areas,
     printTechniques: o.techniques,
     tags: ["CORPORATIVO", o.catTag, modalidadTag],
@@ -276,7 +303,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     material: "80% algodón · 20% poliéster (piqué)", tallas: "S a 3XL", plazo: "5 a 7 días", leadDays: 7,
     modalidad: "Stock express", nota: "Elige versión hombre o mujer",
     colors: ["Azul marino", "Negro", "Rojo", "Blanco", "Azulino", "Gris", "Amarillo", "Naranjo", "Verde"],
-    priceHigh: 12990, priceLow: 9990, techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
+    pricing: tramos({ 10: 8500, 25: 7990, 50: 7500, 100: 6990, 250: 6500 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
   }),
   product({
     key: "PIQML", handle: "polera-pique-cuello-botones-manga-larga",
@@ -285,7 +312,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     material: "80% algodón · 20% poliéster (piqué)", tallas: "S a 3XL", plazo: "5 a 7 días", leadDays: 7,
     modalidad: "Stock express", nota: "Elige versión hombre o mujer",
     colors: ["Negro", "Gris", "Blanco", "Azul marino", "Azulino", "Rojo"],
-    priceHigh: 13990, priceLow: 10990, techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
+    pricing: tramos({ 10: 8900, 25: 8500, 50: 7900, 100: 7500, 250: 6990 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
   }),
   product({
     key: "CRMC", handle: "polera-cuello-redondo-manga-corta",
@@ -293,7 +320,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Polera cuello redondo 100% algodón, la prenda más rendidora para eventos, activaciones y equipos — y la que más colores ofrece del catálogo.",
     material: "100% algodón", tallas: "XS a 3XL", plazo: "3 a 4 días", leadDays: 4, modalidad: "Stock express",
     colors: ["Blanco", "Negro", "Gris", "Azulino", "Azul marino", "Celeste", "Rojo", "Naranjo", "Rosado", "Fucsia", "Amarillo", "Verde militar", "Verde agua", "Verde manzana", "Café", "Beige"],
-    priceHigh: 12990, priceLow: 6990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
+    pricing: tramos({ 10: 5990, 25: 5500, 50: 4500, 100: 3990, 250: 3500 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
   }),
   product({
     key: "CRML", handle: "polera-cuello-redondo-manga-larga",
@@ -301,7 +328,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Polera cuello redondo 100% algodón en manga larga: la misma versatilidad, con más abrigo para el día a día.",
     material: "100% algodón", tallas: "XS a 3XL", plazo: "3 a 5 días", leadDays: 5, modalidad: "Stock express",
     colors: ["Azul marino", "Negro", "Blanco", "Azulino", "Gris", "Rojo"],
-    priceHigh: 13500, priceLow: 8500, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
+    pricing: tramos({ 10: 6500, 25: 5990, 50: 5500, 100: 4990, 250: 4500 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
   }),
   product({
     key: "DRYF", handle: "polera-dry-fit-cuello-redondo",
@@ -309,7 +336,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Polera deportiva dry fit de secado rápido para corridas, clubes y team building. Poliéster respirable que rinde todo el día.",
     material: "100% poliéster (dry fit)", tallas: "Talla 8 a 3XL", plazo: "5 a 7 días hábiles", leadDays: 7, modalidad: "Stock express",
     colors: ["Naranjo", "Negro", "Rojo", "Azul marino", "Azulino", "Blanco", "Gris", "Rosado", "Calypso"],
-    priceHigh: 15990, priceLow: 8990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_PRENDA,
+    pricing: tramos({ 10: 6990, 25: 6500, 50: 5990, 100: 5500, 250: 5200 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_PRENDA,
   }),
   product({
     key: "DRYFB", handle: "polera-dry-fit-cuello-botones",
@@ -317,7 +344,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Polo deportiva dry fit con cuello y botones: el punto medio entre lo técnico y lo formal, para terreno y staff en movimiento.",
     material: "100% poliéster (dry fit)", tallas: "S a 2XL", plazo: "A confirmar al cotizar", leadDays: 7, modalidad: "Stock express",
     colors: ["Rojo", "Negro", "Gris", "Blanco", "Naranjo", "Calypso", "Azul marino", "Azulino"],
-    priceHigh: 16990, priceLow: 8500, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_PRENDA,
+    pricing: tramos({ 10: 9990, 25: 9500, 50: 8990, 100: 8700, 250: 8300 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_PRENDA,
   }),
   product({
     key: "OVER", handle: "polera-oversize",
@@ -325,7 +352,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Polera de corte oversize, el calce urbano que piden los equipos jóvenes. Caída holgada y amplia superficie para estampados grandes.",
     material: "A confirmar al cotizar", tallas: "XS a 2XL", plazo: "5 a 7 días", leadDays: 7, modalidad: "Stock express",
     colors: ["Beige", "Negro", "Blanco", "Gris"],
-    priceHigh: 17500, priceLow: 11500, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
+    pricing: tramos({ 10: 10500, 25: 9990, 50: 8990, 100: 7990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
   }),
 
   // === Polerones y Polar ===================================================
@@ -336,7 +363,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     material: "100% poliéster · micropolar antipilling 300 g · pretina ajustable y puños elasticados", tallas: "XS a 3XL", plazo: "3 a 7 días", leadDays: 7,
     modalidad: "Stock express", nota: "Elige versión hombre o mujer", baseCostUsd: 12,
     colors: ["Azul marino", "Negro", "Azulino", "Rojo", "Beige", "Verde botella", "Gris"],
-    priceHigh: 20500, priceLow: 15500, techniques: [BORDADO], areas: [PECHO_IZQ, PECHO_CENTRO, MANGA],
+    pricing: tramos({ 10: 14500, 25: 13990, 50: 12990, 100: 12500, 250: 11990 }), techniques: [BORDADO], areas: [PECHO_IZQ, PECHO_CENTRO, MANGA],
   }),
   product({
     key: "POLARSM", handle: "polar-sin-manga",
@@ -344,7 +371,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Chaleco polar sin mangas, la capa intermedia perfecta para uniformes de invierno. Abriga el torso sin restar movilidad.",
     material: "100% poliéster", tallas: "XS a 2XL", plazo: "A confirmar al cotizar", leadDays: 7, modalidad: "Stock express", baseCostUsd: 10,
     colors: ["Verde", "Negro", "Azul marino", "Gris"],
-    priceHigh: 16500, priceLow: 12500, techniques: [BORDADO], areas: [PECHO_IZQ, PECHO_CENTRO],
+    pricing: tramos({ 10: 10990, 25: 10500, 50: 9990, 100: 9500 }), techniques: [BORDADO], areas: [PECHO_IZQ, PECHO_CENTRO],
   }),
   product({
     key: "POLO", handle: "poleron-polo-cuello-redondo",
@@ -352,7 +379,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Polerón cuello redondo en mezcla algodón-poliéster, suave por dentro y resistente al uso diario. El básico de invierno que une comodidad y marca.",
     material: "70% algodón · 30% poliéster", tallas: "XS a 3XL", plazo: "A confirmar al cotizar", leadDays: 7, modalidad: "Stock express", baseCostUsd: 10,
     colors: ["Gris", "Negro", "Azul marino", "Azulino", "Blanco", "Rojo", "Naranjo", "Beige", "Lila", "Rosado", "Verde"],
-    priceHigh: 16990, priceLow: 12500, techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
+    pricing: tramos({ 10: 9500, 25: 8990, 50: 8500, 100: 7990, 250: 7500 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
   }),
   product({
     key: "CANGURO", handle: "poleron-canguro",
@@ -360,7 +387,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Hoodie con bolsillo canguro y gorro, el favorito de startups, universidades y equipos jóvenes. Amplio lienzo al frente y la espalda para tu logo.",
     material: "70% algodón · 20% poliéster", tallas: "Talla 6 a 3XL", plazo: "3 a 7 días hábiles", leadDays: 7, modalidad: "Stock express", baseCostUsd: 11,
     colors: ["Azul marino", "Negro", "Gris", "Blanco", "Azulino", "Celeste", "Rojo", "Morado", "Naranjo", "Amarillo", "Rosado", "Fucsia", "Verde agua", "Verde manzana", "Verde militar", "Beige"],
-    priceHigh: 18990, priceLow: 13990, techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
+    pricing: tramos({ 10: 10990, 25: 10500, 50: 9990, 100: 9500, 250: 8500 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
   }),
   product({
     key: "CIERRE", handle: "poleron-cierre-gorro",
@@ -368,7 +395,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Polerón con cierre completo y gorro. Versátil para el uniforme diario y cómodo de poner y sacar; bordado al pecho impecable.",
     material: "70% algodón · 30% poliéster", tallas: "XS a 3XL", plazo: "3 a 5 días", leadDays: 5, modalidad: "Stock express", baseCostUsd: 11,
     colors: ["Negro", "Azulino", "Azul marino", "Gris", "Rojo"],
-    priceHigh: 19500, priceLow: 14500, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
+    pricing: tramos({ 10: 11500, 25: 10990, 50: 10500, 100: 9990, 250: 8990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
   }),
 
   // === Camisas y Blusas ====================================================
@@ -378,7 +405,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Camisa Oxford clásica de uniforme ejecutivo. Acabado prolijo y elegante, ideal para bordar el logo al pecho.",
     material: "Tela Oxford", tallas: "S a 3XL", plazo: "A confirmar al cotizar", leadDays: 7, modalidad: "Stock express", baseCostUsd: 9,
     colors: ["Celeste", "Blanco", "Gris", "Negro"],
-    priceHigh: 16990, priceLow: 13990, techniques: [BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
+    pricing: tramos({ 10: 13990, 25: 13500, 50: 12990, 100: 11500, 250: 10500 }), techniques: [BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
   }),
   product({
     key: "OXFM", handle: "blusa-oxford",
@@ -386,7 +413,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Blusa Oxford de corte femenino, elegante y cómoda para uniforme corporativo. Calce prolijo para la oficina.",
     material: "Tela Oxford", tallas: "S a 2XL", plazo: "A confirmar al cotizar", leadDays: 7, modalidad: "Stock express", baseCostUsd: 9,
     colors: ["Celeste", "Blanco", "Rosado", "Negro", "Gris"],
-    priceHigh: 16990, priceLow: 12990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
+    pricing: tramos({ 10: 12990, 25: 11990, 50: 11500, 100: 10990, 250: 9990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
   }),
   product({
     key: "JEANSH", handle: "camisa-jeans",
@@ -394,7 +421,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Camisa de mezclilla (jeans) para un uniforme con onda casual. Resistente y versátil, va con todo.",
     material: "A confirmar al cotizar", tallas: "S a 2XL", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 9,
     colors: ["Azul jeans"],
-    priceHigh: 18500, priceLow: 14500, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
+    pricing: tramos({ 10: 14990, 25: 13990, 50: 13500, 100: 11990, 250: 10990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
   }),
   product({
     key: "JEANSM", handle: "blusa-jeans",
@@ -402,7 +429,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Blusa de mezclilla (jeans) de corte femenino. Estilo casual y resistente para equipos con personalidad.",
     material: "A confirmar al cotizar", tallas: "S a 2XL", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 9,
     colors: ["Azul jeans"],
-    priceHigh: 17990, priceLow: 13990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
+    pricing: tramos({ 10: 13990, 25: 12990, 50: 12500, 100: 11500, 250: 10500 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
   }),
   product({
     key: "OUTH", handle: "camisa-outdoor",
@@ -410,7 +437,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Camisa outdoor en tela ripstop, resistente y liviana para terreno y actividades al aire libre. Bolsillos utilitarios.",
     material: "Tela ripstop", tallas: "S a 2XL", plazo: "A confirmar al cotizar", leadDays: 7, modalidad: "Stock express", baseCostUsd: 11,
     colors: ["Beige", "Azul", "Gris", "Blanco", "Negro"],
-    priceHigh: 25990, priceLow: 21990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
+    pricing: tramos({ 10: 24500, 25: 23500, 50: 22500, 100: 21500, 250: 20500 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
   }),
   product({
     key: "OUTM", handle: "blusa-outdoor",
@@ -418,7 +445,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Blusa outdoor en tela ripstop de corte femenino. Liviana y resistente para terreno y outdoor.",
     material: "Tela ripstop", tallas: "S a 2XL", plazo: "A confirmar al cotizar", leadDays: 7, modalidad: "Stock express", baseCostUsd: 11,
     colors: ["Gris", "Negro", "Beige", "Azul", "Blanco"],
-    priceHigh: 25990, priceLow: 21990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
+    pricing: tramos({ 10: 23500, 25: 22500, 50: 21500, 100: 20500, 250: 19500 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
   }),
 
   // === Ropa Técnica y Cortavientos =========================================
@@ -428,7 +455,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Softshell de hombre cortaviento y repelente al agua, con interior abrigado. La chaqueta técnica para gerencia y terreno.",
     material: "A confirmar al cotizar", tallas: "S a 3XL", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 16,
     colors: ["Azul marino", "Negro", "Rojo", "Gris"],
-    priceHigh: 28500, priceLow: 22500, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
+    pricing: tramos({ 10: 22990, 25: 22500, 50: 21990, 100: 20990, 250: 19990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
   }),
   product({
     key: "SSHM", handle: "softshell-mujer",
@@ -437,7 +464,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     material: "A confirmar al cotizar", tallas: "S a 3XL", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 16,
     nota: "Disponible hombre y mujer",
     colors: ["Negro", "Azul", "Rojo", "Gris"],
-    priceHigh: 28990, priceLow: 21990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
+    pricing: tramos({ 10: 22500, 25: 21990, 50: 21500, 100: 20500, 250: 19500 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
   }),
   product({
     key: "SSSV", handle: "softshell-sin-manga",
@@ -445,7 +472,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Softshell sin mangas: abrigo cortaviento para el torso sin restar movilidad. Ideal como capa media del uniforme.",
     material: "A confirmar al cotizar", tallas: "S a 2XL", plazo: "3 a 5 días", leadDays: 5, modalidad: "Stock express", baseCostUsd: 14,
     colors: ["Negro", "Rojo", "Azul", "Gris"],
-    priceHigh: 27500, priceLow: 21500, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ, PECHO_CENTRO, ESPALDA],
+    pricing: tramos({ 10: 21500, 25: 20500, 50: 19500, 100: 18900 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ, PECHO_CENTRO, ESPALDA],
   }),
   product({
     key: "CORTAV", handle: "cortavientos",
@@ -454,7 +481,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     material: "Taslan", tallas: "XS a 2XL", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 10,
     nota: "Elige hombre, mujer o unisex",
     colors: ["Azul marino", "Azulino", "Blanco", "Verde", "Rojo", "Negro"],
-    priceHigh: 22990, priceLow: 13990, techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF], areas: AREAS_CAMISA,
+    pricing: tramos({ 10: 15990, 25: 15500, 50: 14990, 100: 14500 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF], areas: AREAS_CAMISA,
   }),
 
   // === Jockeys, Gorros y Accesorios ========================================
@@ -464,7 +491,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Jockey de 6 paneles, el merchandising que más circula: tu logo bordado al frente, a la vista todo el día. Varias calidades de tela.",
     material: "Algodón, denim o gabardina (distintas calidades y precios)", tallas: "Única", plazo: "A confirmar al cotizar", leadDays: 7, modalidad: "Stock express", baseCostUsd: 3,
     colors: ["Negro", "Rojo", "Gris", "Azul", "Azulino", "Naranjo", "Verde", "Amarillo"],
-    priceHigh: 7990, priceLow: 3990, techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF], areas: AREAS_GORRO,
+    pricing: tramos({ 10: 4990, 25: 4500, 50: 3990, 100: 3500, 250: 2990 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF], areas: AREAS_GORRO,
   }),
   product({
     key: "GORROL", handle: "gorro-lana",
@@ -472,7 +499,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Gorro de lana tejido, infaltable en kits de invierno y marcas outdoor. Cálido y con vuelta para bordar.",
     material: "100% lana", tallas: "Única", plazo: "A confirmar al cotizar", leadDays: 7, modalidad: "Stock express", baseCostUsd: 2,
     colors: ["Gris", "Azul", "Azulino", "Negro", "Rojo", "Fucsia", "Rosa"],
-    priceHigh: 6990, priceLow: 3990, techniques: [BORDADO], areas: [GORRO_FRENTE],
+    pricing: tramos({ 10: 4500, 25: 3990, 50: 3500, 100: 2990, 250: 2500 }), techniques: [BORDADO], areas: [GORRO_FRENTE],
   }),
   product({
     key: "BUCKET", handle: "bucket-hat",
@@ -480,7 +507,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Bucket hat, el accesorio de moda para activaciones y equipos jóvenes. Amplia superficie para tu marca.",
     material: "A confirmar al cotizar", tallas: "Única", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 3,
     colors: ["Negro", "Gris", "Azul", "Beige"],
-    priceHigh: 7500, priceLow: 4500, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF, VINILO], areas: AREAS_GORRO,
+    pricing: tramos({ 10: 5990, 25: 5500, 50: 4900, 100: 4500 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF, VINILO], areas: AREAS_GORRO,
   }),
   product({
     key: "SAFARI", handle: "gorro-safari",
@@ -488,7 +515,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Gorro safari de ala ancha, ideal para terreno, turismo y outdoor. Protege del sol y luce tu logo.",
     material: "A confirmar al cotizar", tallas: "Única", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 3,
     colors: ["Beige", "Verde militar", "Negro"],
-    priceHigh: 8500, priceLow: 4500, techniques: [BORDADO, VINILO, TRANSFER_DTF, SERIGRAFIA_1C], areas: AREAS_GORRO,
+    pricing: tramos({ 10: 6990, 25: 6500, 50: 5990, 100: 4990, 250: 4500 }), techniques: [BORDADO, VINILO, TRANSFER_DTF, SERIGRAFIA_1C], areas: AREAS_GORRO,
   }),
   product({
     key: "GPOLAR", handle: "gorro-polar",
@@ -496,16 +523,16 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Gorro polar de poliéster, abrigado y suave para el invierno. Bordado prolijo al frente.",
     material: "Poliéster polar", tallas: "Única", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 2,
     colors: ["Negro", "Azulino", "Azul", "Rojo"],
-    priceHigh: 7500, priceLow: 3500, techniques: [BORDADO], areas: [GORRO_FRENTE],
+    pricing: tramos({ 10: 4500, 25: 3500, 50: 2990, 100: 2500, 250: 2000 }), techniques: [BORDADO], areas: [GORRO_FRENTE],
   }),
   product({
     key: "BANDANA", handle: "bandanas",
     title: "Bandanas", category: "Jockeys, Gorros y Accesorios", catTag: "gorros",
     intro: "Bandanas confeccionadas a medida con tu logo en sublimación full color. Accesorio versátil para eventos y staff.",
-    material: "A confirmar al cotizar", tallas: "Única", plazo: "7 a 12 días", leadDays: 12, modalidad: "Fabricación a medida", minimo: 30, baseCostUsd: 2,
-    nota: "Se confecciona a medida con tu logo",
+    material: "A confirmar al cotizar", tallas: "Única", plazo: "7 a 12 días", leadDays: 12, modalidad: "Fabricación a medida", minimo: 25, baseCostUsd: 2,
+    nota: "Se confecciona a medida con tu logo · mínimo 25 unidades",
     colors: ["Negro"],
-    priceHigh: 6500, priceLow: 3500, techniques: [SUBLIMACION], areas: [PECHO_CENTRO],
+    pricing: tramos({ 25: 5500, 50: 4990, 100: 4500, 250: 3990 }), techniques: [SUBLIMACION], areas: [PECHO_CENTRO],
   }),
 
   // === Delantales y Uniformes ==============================================
@@ -515,7 +542,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Pechera de Polycron o gabardina, resistente para cocina, retail y servicio. Se confecciona a medida con tu marca.",
     material: "Polycron o gabardina", tallas: "Única", plazo: "10 a 12 días (menos si hay stock)", leadDays: 12, modalidad: "Fabricación a medida", baseCostUsd: 5,
     colors: ["Negro", "Rojo", "Blanco", "Café", "Rosado", "Beige", "Verde"],
-    priceHigh: 15990, priceLow: 9990, techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF], areas: AREAS_DELANTAL,
+    pricing: tramos({ 10: 8990, 25: 8500, 50: 7990, 100: 6990, 250: 5990 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF], areas: AREAS_DELANTAL,
   }),
   product({
     key: "PECHB", handle: "pechera-basica",
@@ -523,7 +550,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Pechera básica de poliéster, liviana y económica para equipos de servicio y eventos.",
     material: "100% poliéster", tallas: "Única", plazo: "10 días (3 días si hay stock)", leadDays: 10, modalidad: "Fabricación a medida", baseCostUsd: 3,
     colors: ["Negro", "Azul", "Azulino", "Blanco", "Rojo", "Beige", "Rosado", "Café"],
-    priceHigh: 9990, priceLow: 6900, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF, VINILO], areas: AREAS_DELANTAL,
+    pricing: tramos({ 10: 6990, 25: 5990, 50: 5500, 100: 4990, 250: 4500 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF, VINILO], areas: AREAS_DELANTAL,
   }),
   product({
     key: "PECHJ", handle: "pechera-jeans",
@@ -531,7 +558,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Pechera de mezclilla (jeans), resistente y con estilo para cafeterías, baristas y retail.",
     material: "Jeans (mezclilla)", tallas: "Única", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 5,
     colors: ["Azul", "Negro"],
-    priceHigh: 16500, priceLow: 12500, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_DELANTAL,
+    pricing: tramos({ 10: 9990, 25: 9500, 50: 8990, 100: 8500, 250: 7990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_DELANTAL,
   }),
   product({
     key: "CHEF", handle: "chaqueta-chef",
@@ -539,7 +566,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Chaqueta de chef en gabardina o Polycron, prolija y resistente para cocinas profesionales. Múltiples combinaciones de color.",
     material: "Gabardina o Polycron", tallas: "XS a 3XL", plazo: "15 días (menos si hay stock)", leadDays: 15, modalidad: "Fabricación a medida", baseCostUsd: 9,
     colors: ["Blanco", "Negro", "Café", "Beige"],
-    priceHigh: 25500, priceLow: 18990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ, PECHO_CENTRO, MANGA],
+    pricing: tramos({ 10: 19990, 25: 18990, 50: 17990, 100: 16990, 250: 15990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ, PECHO_CENTRO, MANGA],
   }),
   product({
     key: "MANDB", handle: "mandil-corto-basico",
@@ -547,7 +574,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Mandil corto básico de poliéster, liviano para servicio, barismo y atención. Práctico y económico.",
     material: "Poliéster", tallas: "Única", plazo: "5 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 3,
     colors: ["Negro", "Café", "Rojo"],
-    priceHigh: 8990, priceLow: 5990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_CENTRO],
+    pricing: tramos({ 10: 6990, 25: 6500, 50: 5990, 100: 5500, 250: 4990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_CENTRO],
   }),
   product({
     key: "MANDG", handle: "mandil-corto-grueso",
@@ -555,7 +582,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Mandil corto en gabardina Polycron, más grueso y resistente para uso intensivo en cocina y servicio.",
     material: "Gabardina / Polycron", tallas: "Única", plazo: "3 a 5 días (10 a 15 si se confecciona)", leadDays: 5, modalidad: "Stock express", baseCostUsd: 4,
     colors: ["Negro", "Café", "Rojo"],
-    priceHigh: 9990, priceLow: 6990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_CENTRO],
+    pricing: tramos({ 10: 7990, 25: 7500, 50: 6990, 100: 6500, 250: 5990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_CENTRO],
   }),
   product({
     key: "MANDL", handle: "mandil-largo",
@@ -564,7 +591,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     material: "Poliéster o gabardina", tallas: "Única", plazo: "3 a 5 días en stock / 10 días confección", leadDays: 10, modalidad: "Fabricación a medida", baseCostUsd: 4,
     nota: "El precio depende de la tela",
     colors: ["Negro", "Rojo", "Blanco", "Café", "Verde"],
-    priceHigh: 10990, priceLow: 6990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_DELANTAL,
+    pricing: tramos({ 10: 8990, 25: 8500, 50: 7990, 100: 7500, 250: 6990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_DELANTAL,
   }),
   product({
     key: "MANDLP", handle: "mandil-largo-poliester",
@@ -615,7 +642,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     material: "Gabardina", tallas: "Cintura 38 a 58", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 8,
     nota: "Versión hombre y mujer · opción sin logo disponible",
     colors: ["Beige", "Negro", "Azul marino", "Gris"],
-    priceHigh: 16990, priceLow: 13990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ],
+    pricing: tramos({ 10: 16500, 25: 15990, 50: 14990, 100: 13990, 250: 12990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ],
   }),
   product({
     key: "PDOCKER", handle: "pantalon-docker-gabardina",
@@ -624,7 +651,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     material: "Gabardina", tallas: "Cintura 38 a 58", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 8,
     nota: "Versión hombre y mujer (calce distinto) · opción sin logo disponible",
     colors: ["Beige", "Negro", "Gris", "Azul marino"],
-    priceHigh: 16990, priceLow: 13990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ],
+    pricing: tramos({ 10: 16990, 25: 15990, 50: 14990, 100: 13990, 250: 12990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ],
   }),
   product({
     key: "PPOPLIN", handle: "pantalon-poplin-cargo",
@@ -633,7 +660,10 @@ export const mockCorporateProducts: CorporateProduct[] = [
     material: "Poplin", tallas: "S a 2XL", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 6,
     nota: "Modelo unisex",
     colors: ["Azul marino", "Gris", "Negro"],
-    priceHigh: 13900, priceLow: 8990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ],
+    // ⚠️ Curva irregular según matriz devuelta 2026-06-23: 25u sube a 12.990
+    // (sobre los $11.990 de 10u y 50u). Mantenemos lo que envió la marca hasta
+    // que aclaren si es typo o cobro real.
+    pricing: tramos({ 10: 11990, 25: 12990, 50: 11990, 100: 10500, 250: 9500 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ],
   }),
   product({
     key: "JEANS", handle: "pantalon-jeans",
@@ -642,7 +672,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     material: "Mezclilla azul", tallas: "Cintura 38 a 60", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 7,
     nota: "Hombre y mujer (calce distinto)",
     colors: ["Azul"],
-    priceHigh: 15990, priceLow: 12990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ],
+    pricing: tramos({ 10: 15990, 25: 14990, 50: 13990, 100: 12990, 250: 11990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ],
   }),
   product({
     key: "POUTDOOR", handle: "pantalon-outdoor",
@@ -651,7 +681,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     material: "Tela ripstop", tallas: "Cintura 38 a 60", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 12,
     nota: "Hombre y mujer separados",
     colors: ["Beige", "Negro", "Gris"],
-    priceHigh: 26900, priceLow: 23990, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ],
+    pricing: tramos({ 10: 25500, 25: 24990, 50: 24500, 100: 23500, 250: 22500 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ],
   }),
   product({
     key: "PGSPANDEX", handle: "pantalon-gabardina-spandex",
@@ -660,7 +690,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     material: "97% algodón · 3% spandex", tallas: "Cintura 36 a 58", plazo: "A confirmar al cotizar", leadDays: 7, modalidad: "Stock express", baseCostUsd: 8,
     nota: "Modelo mujer (versión hombre también disponible)",
     colors: ["Beige", "Negro", "Azul marino", "Gris"],
-    priceHigh: 17500, priceLow: 14500, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ],
+    pricing: tramos({ 10: 16500, 25: 15990, 50: 14990, 100: 13990, 250: 12990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ],
   }),
   product({
     key: "PPINZA", handle: "pantalon-pinza-hombre",
@@ -669,7 +699,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     material: "100% algodón", tallas: "Cintura 40 a 64", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 8,
     nota: "Modelo hombre",
     colors: ["Gris", "Negro", "Azul marino", "Beige"],
-    priceHigh: 17500, priceLow: 14500, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ],
+    pricing: tramos({ 10: 16500, 25: 15990, 50: 14990, 100: 13990, 250: 13500 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ],
   }),
   product({
     key: "PFOPOLAR", handle: "pantalon-cargo-forro-polar",
