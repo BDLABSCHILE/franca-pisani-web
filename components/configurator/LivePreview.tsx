@@ -33,6 +33,12 @@ type Props = {
   /** Zona "principal" para referencia de cm reales. Puede ser null. */
   area: PrintArea | null;
   logoUrl: string | null;
+  /**
+   * Color hex (#RRGGBB) para teñir la foto del producto según la variante
+   * seleccionada. Se aplica como overlay con `mix-blend-mode: color` —
+   * preserva luminosidad y sombras de la foto base. Null = sin tinte.
+   */
+  tintColor?: string | null;
 };
 
 /**
@@ -173,7 +179,7 @@ function initialLogoBox(
 }
 
 export const LivePreview = forwardRef<LivePreviewHandle, Props>(
-  function LivePreview({ productImage, allImages, area, logoUrl }, ref) {
+  function LivePreview({ productImage, allImages, area, logoUrl, tintColor }, ref) {
   const logoImg = useHtmlImage(logoUrl);
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState<number>(CANVAS_SIZE);
@@ -413,6 +419,29 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
           className="absolute inset-0 h-full w-full object-contain"
           draggable={false}
         />
+
+        {/* Tinte de color según la variante seleccionada. Dos overlays
+            combinados para que el resultado se vea natural sobre cualquier
+            foto base (blanca, gris, navy):
+            - `multiply` oscurece y aporta saturación → polera blanca + rojo
+              queda roja saturada (no rosa).
+            - `color` encima ajusta el matiz para que tonos parecidos al
+              original no queden lavados.
+            Aproximación visual hasta que lleguen las fotos reales por color. */}
+        {tintColor && (
+          <>
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 transition-colors duration-200"
+              style={{ backgroundColor: tintColor, mixBlendMode: "multiply" }}
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 transition-colors duration-200"
+              style={{ backgroundColor: tintColor, mixBlendMode: "color", opacity: 0.6 }}
+            />
+          </>
+        )}
 
         <Stage
           width={containerSize}

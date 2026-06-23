@@ -14,6 +14,7 @@ import { PricingPanel } from "./PricingPanel";
 import { StockAnalysis } from "./StockAnalysis";
 import { LogoUploader, type LogoState } from "./LogoUploader";
 import { LivePreview, type LivePreviewHandle } from "./LivePreview";
+import { tintForColor } from "@/lib/brand/color-tints";
 import { AddToQuoteButton } from "./AddToQuoteButton";
 
 type Props = {
@@ -155,6 +156,9 @@ export function ProductConfigurator({ product, inventoryByVariantId }: Props) {
           allImages={product.images.length > 0 ? product.images : [product.featuredImage]}
           area={selectedArea}
           logoUrl={logo?.previewUrl ?? null}
+          tintColor={tintForColor(
+            selectedVariant?.selectedOptions.find((o) => o.name === "Color")?.value,
+          )}
         />
       </div>
 
