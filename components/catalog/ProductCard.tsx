@@ -54,7 +54,7 @@ export function ProductCard({ product, stockTotal }: Props) {
         <FlowBadge tags={product.tags} />
         {/* Client island: si el visitante subió su logo, lo muestra aplicado
             sobre la foto. El card completo sigue siendo server component. */}
-        <LogoOverlayBadge />
+        <LogoOverlayBadge category={product.category} />
       </div>
 
       <div className="flex flex-col gap-1.5 sm:gap-2">

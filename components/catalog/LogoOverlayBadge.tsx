@@ -4,6 +4,42 @@ import { useSyncExternalStore } from "react";
 import { logoStore } from "@/lib/logo/store";
 
 /**
+ * Posición y tamaño del logo en la previsualización del catálogo según el
+ * tipo de prenda. Cada producto cae naturalmente en una zona típica:
+ *  - Pantalones → muslo izquierdo (más abajo y chico)
+ *  - Gorros / accesorios → frente del gorro (más arriba, centrado)
+ *  - Resto (poleras, polerones, camisas, softshell, pecheras, mandiles)
+ *    → centro-pecho con tamaño parecido al sello real de un bordado/estampado.
+ *
+ * Coordenadas relativas al cuadrado de la foto, con anclaje centrado
+ * (`-translate-x-1/2 -translate-y-1/2`). Pensado para fotos ghost-mannequin
+ * 1:1 donde la prenda queda centrada.
+ */
+type LogoPos = {
+  top: string;
+  left: string;
+  width: string;
+};
+
+function logoPositionFor(category: string): LogoPos {
+  if (category === "Pantalones") {
+    // Muslo izquierdo, chico — como una etiqueta lateral.
+    return { top: "44%", left: "38%", width: "12%" };
+  }
+  if (category === "Jockeys, Gorros y Accesorios") {
+    // Frente del gorro: más arriba y centrado.
+    return { top: "40%", left: "50%", width: "16%" };
+  }
+  // Default — poleras, polerones, camisas, softshell, pecheras, mandiles,
+  // chaqueta chef, cofia: centro-pecho.
+  return { top: "42%", left: "50%", width: "22%" };
+}
+
+type Props = {
+  category: string;
+};
+
+/**
  * Sello del logo del visitante sobre la foto de cada producto del catálogo.
  *
  * Client island chico que se monta dentro del contenedor de imagen del
@@ -12,11 +48,12 @@ import { logoStore } from "@/lib/logo/store";
  * logo (en el banner del catálogo o en cualquier ficha), cada card lo muestra
  * aplicado como referencia visual + un microbadge celeste "Con tu logo".
  *
- * El blend multiply asienta el logo sobre la foto clara del producto sin
- * recuadro blanco. Es solo una previsualización: el mockup real lo confirma
- * el equipo antes de producir.
+ * La posición y tamaño dependen de la categoría del producto (ver
+ * logoPositionFor). El blend multiply asienta el logo sobre la foto clara
+ * sin recuadro blanco. Es solo una previsualización: el mockup real lo
+ * confirma el equipo antes de producir.
  */
-export function LogoOverlayBadge() {
+export function LogoOverlayBadge({ category }: Props) {
   const dataUrl = useSyncExternalStore(
     logoStore.subscribe,
     logoStore.getSnapshot,
@@ -25,17 +62,15 @@ export function LogoOverlayBadge() {
 
   if (!dataUrl) return null;
 
+  const pos = logoPositionFor(category);
+
   return (
     <>
-      {/* Logo posicionado a la altura del pecho (levemente sobre el centro),
-          máx ~22% del ancho de la foto para que se lea como aplicación real
-          y no como marca de agua. pointer-events-none: el card sigue siendo
-          un link clickeable completo. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[42%] w-[22%] -translate-x-1/2 -translate-y-1/2"
+        className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2"
+        style={{ top: pos.top, left: pos.left, width: pos.width }}
       >
-        {/* Data URL local → <img> nativo (next/image no aplica aquí). */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={dataUrl}
