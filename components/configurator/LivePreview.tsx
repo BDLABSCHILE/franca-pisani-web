@@ -414,24 +414,6 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
           draggable={false}
         />
 
-        {/* Guía del área imprimible: rect punteado celeste que aparece
-            mientras el cliente arrastra/transforma y se desvanece al soltar. */}
-        {printRect && (
-          <div
-            aria-hidden
-            className={cn(
-              "pointer-events-none absolute rounded-[4px] border-2 border-dashed border-rpc-info transition-opacity duration-500",
-              isAdjusting && logoImg ? "opacity-40" : "opacity-0",
-            )}
-            style={{
-              left: `${(printRect.x / CANVAS_SIZE) * 100}%`,
-              top: `${(printRect.y / CANVAS_SIZE) * 100}%`,
-              width: `${(printRect.width / CANVAS_SIZE) * 100}%`,
-              height: `${(printRect.height / CANVAS_SIZE) * 100}%`,
-            }}
-          />
-        )}
-
         <Stage
           width={containerSize}
           height={containerSize}
