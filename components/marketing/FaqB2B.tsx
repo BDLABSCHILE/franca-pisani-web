@@ -14,24 +14,40 @@ const FAQS = [
     a: "Trabajamos bordado, serigrafía (1 color y full color), transfer DTF, vinilo textil y sublimación. La elección depende de la prenda, del diseño y de la cantidad: el bordado da un acabado premium en camisas y polerones; la serigrafía rinde muy bien en volúmenes altos; el DTF permite full color con detalle fino; el vinilo es ideal para nombres y números; y la sublimación integra el color a la tela. Cada ficha muestra las técnicas disponibles, y al cotizar te recomendamos la que mejor calza con tu caso.",
   },
   {
-    q: "¿Puedo mezclar tallas en un mismo pedido?",
-    a: "Sí. Defines tu curva de tallas dentro de la cantidad total del pedido — por ejemplo, distintas cantidades de S, M, L y XL de la misma prenda. Si no tienes clara la distribución para tu equipo, te ayudamos a armarla.",
+    q: "¿Puedo mezclar tallas y colores en un mismo pedido?",
+    a: "Sí. Defines tu curva de tallas y colores dentro de la cantidad total del pedido — por ejemplo, distintas cantidades de S, M, L y XL en negro y blanco de la misma prenda. Si no tienes clara la distribución para tu equipo, te ayudamos a armarla.",
   },
   {
     q: "¿Puedo ver una muestra antes de producir?",
     a: "Sí, en dos niveles. En el sitio puedes subir tu logo y verlo aplicado sobre el producto al instante. Y antes de entrar a producción, el equipo valida contigo el arte final (mockup) para que apruebes sobre seguro.",
   },
   {
-    q: "¿Cuáles son los plazos de entrega?",
-    a: "Depende del modo. Los pedidos con stock express en Chile salen más rápido, porque la prenda ya está acá y solo se personaliza. Los proyectos de fabricación a medida toman más tiempo, porque se producen desde cero en nuestras fábricas. El plazo concreto depende del producto, la cantidad y la técnica — te lo confirmamos en la cotización, con respuesta en menos de 24 horas.",
+    q: "¿Cuáles son los plazos de entrega? ¿Tienen plazo express?",
+    a: "Los pedidos con stock express en Chile salen rápido porque la prenda ya está acá y solo se personaliza; los proyectos de fabricación a medida toman más, porque se producen desde cero. Si necesitas algo realmente urgente, manejamos una opción express de 2 días para volúmenes bajos. El plazo concreto depende del producto, la cantidad y la técnica, y se confirma en la cotización en menos de 24 horas.",
   },
   {
-    q: "¿Emiten factura? ¿Cómo se manejan los precios con IVA?",
-    a: "Sí, emitimos factura electrónica a nombre de tu empresa (necesitamos razón social, RUT y giro). En la cotización formal ves el detalle de valores netos e IVA línea por línea, para que tu equipo de finanzas lo revise sin ambigüedad.",
+    q: "¿Cuánto influye el tamaño del logo en el precio?",
+    a: "Manejamos tres tamaños: insignia (5 a 12 cm, típico al pecho), tamaño carta (~28 cm, como una hoja A4) y gigantografía (sobre 33 cm, espalda completa). El precio del estampado sube según el tamaño, y cada logo en una zona extra (pecho + espalda, por ejemplo) se cobra aparte. En la ficha del producto eliges la zona; en la cotización afinamos el tamaño exacto.",
+  },
+  {
+    q: "¿Cobran setup, fotolito o digitalización del logo?",
+    a: "El bordado tiene una matriz (digitalización del logo) que se cobra una sola vez por logo, y queda gratis sobre 50 unidades. Para que la cotización salga limpia, idealmente nos envías el logo vectorizado: AI para estampado y PDF para bordado.",
+  },
+  {
+    q: "¿Emiten factura? ¿Los precios incluyen IVA?",
+    a: "Sí, emitimos factura electrónica a nombre de tu empresa (necesitamos razón social, RUT y giro). Todos los precios del catálogo y de la cotización son netos: el IVA del 19% se suma al final del documento, línea por línea, para que tu equipo de finanzas lo revise sin ambigüedad.",
   },
   {
     q: "¿Despachan a regiones?",
-    a: "Sí, despachamos a todo Chile. El costo y el plazo del despacho dependen del volumen y del destino, y se confirman en la cotización final junto con el resto de las condiciones.",
+    a: "Sí, despachamos a todo Chile. En la Región Metropolitana el despacho es gratis sobre 25 unidades; a regiones se cotiza con el cliente según el destino y el volumen. El plazo y el valor del despacho se confirman en la cotización final.",
+  },
+  {
+    q: "¿Cómo manejan el pago?",
+    a: "Para clientes nuevos pedimos el 50% de adelanto al confirmar el pedido y el 50% restante contra entrega. También trabajamos con orden de compra contra entrega, o pago a 30 días si el cliente tiene historial o respaldo. La forma exacta la afinamos en la cotización.",
+  },
+  {
+    q: "¿Hay cambios o devoluciones?",
+    a: "Como las prendas se personalizan con el logo de cada cliente, los cambios y devoluciones aplican solo si hay un error de nuestro lado (defecto de producción, color o talla equivocada, arte distinto al aprobado). En cualquiera de esos casos lo resolvemos sin costo para ti.",
   },
 ] as const;
 

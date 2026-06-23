@@ -5,13 +5,47 @@
 > completa y funcional. Antes de lanzar en vivo hay que confirmarla o
 > reemplazarla con la marca. Ordenado por prioridad.
 >
-> Última actualización: 2026-06-23 · catálogo completo de **47 productos reales**
-> en 7 categorías (Poleras, Polerones y Polar, Camisas y Blusas, Pantalones,
-> Ropa Técnica y Cortavientos, Jockeys/Gorros/Accesorios, Delantales y Uniformes).
+> Última actualización: 2026-06-23 · catálogo de **47 productos reales** en 7
+> categorías + **reglas comerciales y precios de técnicas CONFIRMADOS por la
+> marca** en la matriz devuelta el 2026-06-23.
 
 ---
 
-## 🔴 Prioridad alta — afecta lo que el cliente ve y los precios
+## ✅ Lo que la marca ya confirmó (2026-06-23)
+
+**Reglas generales (hoja "Reglas generales" de la matriz devuelta):**
+- ✅ **IVA = NETO** (los rangos no incluyen IVA; el 19% se suma al final). El
+  sitio ya estaba modelado así.
+- ✅ **Rango = solo la prenda**, no incluye logo. El sitio ya lo modela así
+  (técnica se suma encima de la prenda).
+- ✅ **Descuento por volumen desde 50 unidades.**
+- ✅ **Mezclar tallas y colores en un mismo pedido: sí.**
+- ✅ **Cada logo extra (zona adicional) se cobra.**
+- ✅ **Bordado**: matriz se cobra **una vez por logo · gratis sobre 50 u**.
+- ✅ **Plazo express: 2 días.**
+- ✅ **Despacho:** gratis sobre 25 u en RM; regiones paga el cliente.
+- ✅ **Pago:** cliente nuevo 50% adelanto + 50% contra entrega, OC contra entrega,
+  o 30 días con respaldo.
+- ✅ **Devoluciones:** solo por error de RPC.
+- ✅ **Logos:** que el cliente envíe vectorizado (AI estampado, PDF bordado).
+
+**Precios de técnicas (hoja "Técnicas de estampado"), por tamaño:**
+
+| Técnica | Mín | Insignia (5–12 cm) | Carta (~28 cm) | Gigantografía (>33 cm) |
+|---|---|---|---|---|
+| Serigrafía 1 color | 20 | $1.000 | $2.000 | — |
+| Serigrafía full color (hasta 5 colores) | 20 | $2.000 | $3.000 | — |
+| Bordado | 10 | $2.500 | $5.000 | $7.000 |
+| DTF / Transfer digital | 10 | $2.500 | $4.500 | $6.500 |
+| Vinilo textil | — | $2.800 | $5.000 | — |
+
+Aplicados al sitio: el `basePriceUnit` de cada técnica usa el precio **insignia**
+(caso default). Los recargos por carta y gigantografía quedan en la descripción
+hasta que sumemos un selector de tamaño al configurador (UI pendiente).
+
+---
+
+## 🔴 Prioridad alta — todavía pendientes
 
 ### 1. Fotos de producto (todas generadas con IA)
 Las **47 fotos** del catálogo son **generadas** (prenda en blanco, maniquí
@@ -19,35 +53,42 @@ invisible, fondo gris de estudio). Se ven profesionales y consistentes, pero
 **no son las prendas reales** de RPC.
 - **Pedir:** fotos reales de estudio de cada producto. Idealmente frente +
   espalda y, si se puede, una foto por color.
-- Mientras tanto las generadas sirven perfecto para la presentación.
-- Cada producto hoy muestra **un solo color "hero"** (el de la foto); el resto
-  de los colores son botones de texto. Las fotos por color quedan pendientes.
+- Cada producto muestra hoy un solo color "hero"; las fotos por color quedan
+  pendientes.
 
-### 2. Precios — los tramos por volumen están DERIVADOS, no confirmados
-La marca entregó un **rango por unidad** por producto (ej. 8.500 – 13.500) y la
-regla *"sobre 50 unidades baja harto"*. A partir de eso armamos una tabla de
-tramos (10 / 25 / 50 / 100 u). **Los valores intermedios (25u, 50u) son
-interpolados por nosotros**, no son precios reales.
-- **Pedir:** la tabla real de precios por cantidad de cada producto.
+### 2. Tramos exactos por producto (la marca no llenó esta columna)
+La marca **no completó los tramos por cantidad** producto a producto
+(25 u / 50 u / 250 u / 500 u / 1.000 u quedaron en blanco). Solo entregó tope
+del rango (10 u) y piso (100 u). Hoy interpolamos los intermedios con la regla
+"sobre 50 baja harto".
+- **Pedir:** los tramos reales si quieren precios por volumen 100% exactos.
+  Si no, podemos seguir con la interpolación (es buena aproximación).
 
-### 3. Precio "prenda + técnica por separado" — los totales superan el rango
-Por decisión tuya, el configurador muestra el **precio de la prenda** y le
-**suma la técnica encima** (Bordado +$3.000, Serigrafía +$1.000, DTF +$3.000).
-Eso hace que el **total final quede por sobre el rango** que entregó la marca.
-- ⚠️ Su ejemplo (*"50 poleras cuello redondo con bordado insignia = $8.500"*)
-  sugiere que **el rango ya incluía un logo básico**. Hay que **confirmar con la
-  marca** si el rango es prenda sola (modelo actual) o prenda con logo incluido.
-  Esto cambia todos los totales que ve el cliente.
+### 3. Sublimación: precio y mínimo
+La marca **no entregó precio ni mínimo** para sublimación. La técnica está
+publicada (la usa Bandanas), con precio de referencia $1.390 y nota "se confirma
+al cotizar".
 
-### 4. Precios de técnicas incompletos
-La marca dio: Serigrafía $1.000 (mín 20), Bordado $3.000 (mín 10), DTF $3.000
-(mín 10). **Faltan:**
-- **Sublimación**: ofrecida, sin precio ni mínimo → usada en Bandanas, referencial.
-- **Vinilo textil (corte)**: ofrecida, sin precio → le pusimos **$990 referencial**.
-- **Setup / fotolito / digitalización**: lo dejamos en **$0**. Confirmar si cobran setup.
-- **Recargo por zona extra** (2ª posición): inventado referencial. Confirmar.
-- **IVA**: asumimos que los rangos son **netos (+IVA)**. Solo el producto #5 decía
-  "más IVA" explícito. Confirmar si los demás son netos o con IVA incluido.
+### 4. Setup de serigrafía
+La marca confirmó setup para **bordado** (gratis sobre 50 u) pero **dejó en
+blanco** el de serigrafía. Hoy lo asumimos en $0. Confirmar.
+
+### 5. Recargo por logo complejo (degradados, mucho detalle)
+Quedó en blanco. Confirmar si suma $ extra y de qué orden.
+
+### 6. Descuento por volumen — ¿por producto o por pedido total?
+Quedó en blanco. Hoy aplicamos por producto.
+
+### 7. UI pendiente: selector de tamaño del logo
+El sitio cobra el precio **insignia** por defecto. Para reflejar carta /
+gigantografía hay que agregar un selector en el configurador (1 hora de trabajo
+cuando decidamos hacerlo).
+
+### 8. Los 5 productos del último incremento (#43–#47) no fueron evaluados
+Gorro de Chef, Cofia, Mandil Largo Poliéster, Jockey Gabardina para Estampado y
+Pantalón Cargo Forro Polar **no estaban en la matriz que devolvieron** (porque
+les mandé la versión anterior). Cargados con sus rangos, pero la marca aún no
+los validó.
 
 ---
 

@@ -31,69 +31,73 @@ export const TECHNIQUE_INFO: readonly TechniqueDetail[] = [
   {
     matchKeys: [
       "serigrafia-1-color",
+      "serigrafia_1c",
       "serigrafia",
       "serigrafía",
       "serigrafía 1 color",
     ],
     headline: "Serigrafía 1 color",
     description:
-      "Estampa por capas, similar a un sello industrial. Se aplica tinta sólida en una sola tonalidad sobre el producto (mochilas, poleras, bolsos). Tacto firme, durable a lavados y al uso diario. Es la técnica clásica que viste en bolsas de tela de eventos o uniformes.",
+      "Estampa por capas, similar a un sello industrial. Se aplica tinta sólida en una sola tonalidad sobre la prenda. Tacto firme, durable a lavados y al uso diario. Es la técnica clásica de uniformes y bolsos corporativos.",
     features: [
       "1 sola tinta plana (ej: blanco sobre negro)",
       "Durable: aguanta lavado de máquina y uso intensivo",
-      "Costo por unidad bajo en volúmenes grandes",
-      "Requiere fotolito (setup fee) que se amortiza con la cantidad",
+      "Precios por tamaño: insignia (5–12 cm) $1.000, carta (~28 cm) $2.000 por prenda",
+      "Mínimo 20 unidades · costo por unidad muy bajo en volúmenes grandes",
     ],
     bestFor:
-      "Logos simples de 1 color sin degradados ni detalles finos. Por ejemplo un wordmark monocromo o un icono sólido.",
+      "Logos simples de 1 a 2 colores planos, sin degradados ni detalles finos.",
     limitations:
-      "No reproduce degradados ni fotos. Si tu logo tiene varios colores, conviene serigrafía full color o DTF.",
+      "No reproduce degradados ni fotos. Si tu logo tiene más de 2 colores, conviene serigrafía full color o DTF.",
   },
   {
-    matchKeys: ["serigrafia-full-color", "serigrafía full color", "full color"],
+    matchKeys: ["serigrafia-full-color", "serigrafia_full", "serigrafía full color", "full color"],
     headline: "Serigrafía full color",
     description:
-      "Variante de serigrafía con múltiples capas de tinta para reproducir logos con varios colores. Cada color es una pasada distinta, así que el setup es mayor pero el resultado es premium: colores planos vivos y precisión Pantone.",
+      "Variante de serigrafía con varias capas de tinta para reproducir logos con hasta 5 colores. Cada color es una pasada distinta y el resultado es premium: colores planos vivos y precisión cromática.",
     features: [
-      "Múltiples colores planos (típicamente 2 a 5)",
-      "Excelente fidelidad de color Pantone",
+      "Hasta 5 colores planos por logo",
+      "Excelente fidelidad de color",
       "Tacto firme y resistente",
-      "Setup fee mayor que serigrafía 1 color",
+      "Precios por tamaño: insignia (5–12 cm) $2.000, carta (~28 cm) $3.000 por prenda",
+      "Mínimo 20 unidades",
     ],
     bestFor:
-      "Logos con 2-5 colores sólidos, sin degradados. Marcas con identidad cromática fuerte.",
+      "Logos con 2 a 5 colores sólidos, sin degradados. Marcas con identidad cromática fuerte.",
     limitations:
-      "No reproduce degradados, fotos ni detalles muy finos. Para eso usar DTF.",
+      "No reproduce degradados, fotos ni detalles muy finos. Para eso, DTF.",
   },
   {
     matchKeys: ["bordado", "embroidery"],
     headline: "Bordado",
     description:
-      "Aplicación con hilo cosido directo sobre la tela. Es la técnica más premium en percepción: textura tridimensional, brillo del hilo, sensación artesanal. La que verías en gorras o polerones de marcas deportivas premium.",
+      "Aplicación con hilo cosido directo sobre la tela. Es la técnica más premium en percepción: textura tridimensional, brillo del hilo y sensación artesanal. Imprescindible en camisas, polerones y jockeys de uniforme corporativo.",
     features: [
-      "Textura 3D real con hilo poliéster o algodón",
+      "Textura 3D real con hilo poliéster",
       "Mayor durabilidad: no se desgasta como una impresión",
-      "Look y feel premium",
-      "Setup por digitalización del logo (única vez)",
+      "Precios por tamaño: insignia (5–12 cm) $2.500, carta (~28 cm) $5.000, gigantografía (>33 cm) $7.000 por prenda",
+      "Matriz del logo: se cobra una sola vez por arte · gratis sobre 50 unidades",
+      "Mínimo 10 unidades",
     ],
     bestFor:
-      "Logos compactos sobre mochilas, jockey, polerones. Marcas que comunican calidad/legado.",
+      "Logos compactos sobre camisas, polerones, jockeys y polar. Marcas que comunican calidad y legado.",
     limitations:
-      "No funciona bien con detalles finos (texto pequeño <8mm). Tampoco con degradados o fotos. Tarda más que las técnicas planas.",
+      "No funciona bien con detalles finos (texto chico <8 mm), degradados ni fotos. Tarda algo más que las técnicas planas.",
   },
   {
-    matchKeys: ["dtf", "transfer-dtf", "transfer dtf"],
+    matchKeys: ["dtf", "transfer_dtf", "transfer-dtf", "transfer dtf"],
     headline: "Transfer DTF",
     description:
-      "Direct-To-Film: imprime tu diseño en una película especial que se transfiere por calor al producto. Permite full color, degradados, fotos y detalles finos. Es la técnica más versátil para diseños complejos.",
+      "Direct-To-Film: imprime tu diseño en una película especial que se transfiere por calor a la tela. Permite full color, degradados, fotos y detalles finos. Es la técnica más versátil para artes complejos.",
     features: [
-      "Reproduce cualquier color, degradados, fotos",
-      "Detalles finos perfectos (incluso texto chico)",
-      "Sin setup fee de fotolito",
-      "Resistente al lavado",
+      "Reproduce cualquier color, degradados y fotos",
+      "Detalles finos perfectos, incluso texto chico",
+      "Sin setup: pagas solo por prenda",
+      "Precios por tamaño: insignia (5–12 cm) $2.500, carta (~28 cm) $4.500, gigantografía (>33 cm) $6.500 por prenda",
+      "Mínimo 10 unidades · resistente al lavado",
     ],
     bestFor:
-      "Logos full color con degradados, ilustraciones, fotos, diseños complejos. Cuando la fidelidad visual importa más que la textura.",
+      "Logos full color, ilustraciones, fotos y diseños complejos. Cuando la fidelidad visual importa más que la textura.",
     limitations:
       "Tacto más plástico que serigrafía (se siente la película). En zonas muy grandes, el tacto es notorio.",
   },
@@ -105,13 +109,29 @@ export const TECHNIQUE_INFO: readonly TechniqueDetail[] = [
     features: [
       "Colores planos sólidos, bordes nítidos",
       "Ideal para nombres y números personalizados por prenda",
-      "Sin costo de setup ni fotolito",
-      "Buena resistencia al lavado en prendas deportivas",
+      "Sin costo de setup",
+      "Precios por tamaño: insignia (5–12 cm) $2.800, carta (~28 cm) $5.000 por prenda",
     ],
     bestFor:
       "Logos y textos de 1 a 2 colores planos, numeración y nombres. Equipos deportivos y prendas donde cada unidad lleva un dato distinto.",
     limitations:
-      "No reproduce degradados, fotos ni muchos colores: cada color es una lámina aparte. Para full color conviene DTF.",
+      "No reproduce degradados, fotos ni muchos colores: cada color es una lámina aparte. Para full color, DTF.",
+  },
+  {
+    matchKeys: ["sublimacion", "sublimación"],
+    headline: "Sublimación",
+    description:
+      "La tinta se integra a la fibra del poliéster claro o a la superficie del accesorio (tazones, bandanas). Reproduce full color y se siente como parte de la tela: no hay textura adicional.",
+    features: [
+      "Full color con degradados y fotos",
+      "Sin tacto añadido: el color es parte de la tela",
+      "Ideal para poliéster claro, no funciona en algodón ni colores oscuros",
+      "Precio se confirma al cotizar (tarifa por definir con la marca)",
+    ],
+    bestFor:
+      "Bandanas, tazones, banderines, prendas deportivas claras 100% poliéster con artes a todo color.",
+    limitations:
+      "Solo funciona sobre poliéster claro o accesorios con coating sublimable. No sirve en algodón ni en prendas oscuras.",
   },
   {
     matchKeys: ["laser", "grabado-laser", "grabado láser"],
