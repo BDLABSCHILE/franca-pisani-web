@@ -126,16 +126,20 @@ export function ProductConfigurator({ product, inventoryByVariantId }: Props) {
   ]);
 
   // Imagen del producto que se muestra en el LivePreview.
-  // Si la zona tiene imageUrl real (https://...), úsala; sino fallback a la
-  // variante o la featured. Algunos productos no van a tener imágenes por zona
-  // configuradas hasta que el equipo suba fotos de cada ángulo a Shopify CDN.
+  // Si la zona apunta a una imagen "real" (foto local /products/ o Shopify CDN),
+  // se usa esa foto para mostrar la cara/ángulo correspondiente — ej. al elegir
+  // "Espalda" se ve la prenda de atrás. Si no, fallback a la variante / featured.
   const previewImage = useMemo(() => {
-    if (selectedArea?.imageUrl?.includes("cdn.shopify.com/s/")) {
+    const url = selectedArea?.imageUrl;
+    const isRealImage =
+      !!url &&
+      (url.startsWith("/products/") || url.includes("cdn.shopify.com/s/"));
+    if (isRealImage) {
       return {
-        url: selectedArea.imageUrl,
-        altText: `${product.title} · ${selectedArea.label}`,
-        width: 1200,
-        height: 1200,
+        url: url!,
+        altText: `${product.title} · ${selectedArea!.label}`,
+        width: 1280,
+        height: 1280,
       };
     }
     return selectedVariant?.image ?? product.featuredImage;

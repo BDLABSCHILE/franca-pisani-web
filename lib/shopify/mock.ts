@@ -123,6 +123,12 @@ function placeholderImage(label: string, width = 1200, height = 1200): ShopifyIm
 
 // --- Zonas de impresión -------------------------------------------------------
 
+/**
+ * Una zona de impresión. `imageUrl` apunta a la vista del producto que
+ * corresponde a esa zona (frente / espalda / lateral) — el LivePreview cambia
+ * la foto al seleccionarla. Si la URL empieza con `/products/...` el
+ * ProductConfigurator la usa; si es placeholder, cae al featured image.
+ */
 const area = (
   id: string,
   label: string,
@@ -130,28 +136,46 @@ const area = (
   maxWcm: number,
   maxHcm: number,
   pxPerCm: number,
+  imageUrl?: string,
 ): PrintArea => ({
   id,
   label,
-  imageUrl: placeholderImage(label).url,
+  imageUrl: imageUrl ?? placeholderImage(label).url,
   areaPolygon: poly,
   maxWidthCm: maxWcm,
   maxHeightCm: maxHcm,
   pxPerCm,
 });
 
+// Áreas "de frente" — usan la foto principal del producto, así que no setean imageUrl.
 const PECHO_IZQ = area("pecho_izq", "Pecho izquierdo", [[640, 420], [840, 420], [840, 580], [640, 580]], 10, 10, 28);
 const PECHO_CENTRO = area("pecho_centro", "Pecho centro", [[420, 430], [780, 430], [780, 720], [420, 720]], 28, 35, 24);
-const ESPALDA = area("espalda", "Espalda", [[400, 380], [800, 380], [800, 760], [400, 760]], 30, 40, 24);
 const MANGA = area("manga", "Manga", [[480, 470], [720, 470], [720, 610], [480, 610]], 8, 8, 30);
 const GORRO_FRENTE = area("gorro_frente", "Frente del gorro", [[440, 420], [760, 420], [760, 640], [440, 640]], 12, 6, 30);
-const GORRO_LATERAL = area("gorro_lateral", "Lateral del gorro", [[500, 460], [740, 460], [740, 600], [500, 600]], 7, 4, 32);
 
-// Conjuntos de zonas reutilizables
-const AREAS_PRENDA = [PECHO_IZQ, PECHO_CENTRO, ESPALDA, MANGA];
-const AREAS_CAMISA = [PECHO_IZQ, ESPALDA, MANGA];
+// Áreas "de espalda / lateral" — apuntan a fotos específicas. Como las fotos
+// de espalda son por tipo de prenda (no por producto individual), cada
+// categoría tiene su propia constante ESPALDA_X. AREAS_PRENDA, AREAS_CAMISA,
+// etc. se materializan después (necesitan estas constantes).
+const ESPALDA_POLERA = area("espalda", "Espalda", [[400, 380], [800, 380], [800, 760], [400, 760]], 30, 40, 24, "/products/_espalda-polera.webp");
+const ESPALDA_PIQUE = area("espalda", "Espalda", [[400, 380], [800, 380], [800, 760], [400, 760]], 30, 40, 24, "/products/_espalda-pique.webp");
+const ESPALDA_POLERON = area("espalda", "Espalda", [[400, 360], [800, 360], [800, 780], [400, 780]], 35, 45, 22, "/products/_espalda-poleron.webp");
+const ESPALDA_CAMISA = area("espalda", "Espalda", [[400, 380], [800, 380], [800, 760], [400, 760]], 28, 38, 24, "/products/_espalda-camisa.webp");
+const ESPALDA_SOFTSHELL = area("espalda", "Espalda", [[400, 360], [800, 360], [800, 780], [400, 780]], 30, 40, 22, "/products/_espalda-softshell.webp");
+const GORRO_LATERAL = area("gorro_lateral", "Lateral del gorro", [[500, 460], [740, 460], [740, 600], [500, 600]], 7, 4, 32, "/products/_lateral-jockey.webp");
+
+// Conjuntos de zonas reutilizables (espalda según tipo de prenda).
+const AREAS_POLERA = [PECHO_IZQ, PECHO_CENTRO, ESPALDA_POLERA, MANGA];
+const AREAS_PIQUE = [PECHO_IZQ, PECHO_CENTRO, ESPALDA_PIQUE, MANGA];
+const AREAS_POLERON = [PECHO_IZQ, PECHO_CENTRO, ESPALDA_POLERON, MANGA];
+const AREAS_CAMISA = [PECHO_IZQ, ESPALDA_CAMISA, MANGA];
+const AREAS_SOFTSHELL = [PECHO_IZQ, ESPALDA_SOFTSHELL, MANGA];
 const AREAS_GORRO = [GORRO_FRENTE, GORRO_LATERAL];
 const AREAS_DELANTAL = [PECHO_CENTRO, PECHO_IZQ];
+
+// Alias de compat: AREAS_PRENDA == AREAS_POLERA (las usan productos antiguos
+// que aún no migran al alias específico). Se eliminan cuando todos migren.
+const AREAS_PRENDA = AREAS_POLERA;
 
 // --- Helpers ------------------------------------------------------------------
 
@@ -303,7 +327,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     material: "80% algodón · 20% poliéster (piqué)", tallas: "S a 3XL", plazo: "5 a 7 días", leadDays: 7,
     modalidad: "Stock express", nota: "Elige versión hombre o mujer",
     colors: ["Azul marino", "Negro", "Rojo", "Blanco", "Azulino", "Gris", "Amarillo", "Naranjo", "Verde"],
-    pricing: tramos({ 10: 8500, 25: 7990, 50: 7500, 100: 6990, 250: 6500 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
+    pricing: tramos({ 10: 8500, 25: 7990, 50: 7500, 100: 6990, 250: 6500 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF, VINILO], areas: AREAS_PIQUE,
   }),
   product({
     key: "PIQML", handle: "polera-pique-cuello-botones-manga-larga",
@@ -312,7 +336,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     material: "80% algodón · 20% poliéster (piqué)", tallas: "S a 3XL", plazo: "5 a 7 días", leadDays: 7,
     modalidad: "Stock express", nota: "Elige versión hombre o mujer",
     colors: ["Negro", "Gris", "Blanco", "Azul marino", "Azulino", "Rojo"],
-    pricing: tramos({ 10: 8900, 25: 8500, 50: 7900, 100: 7500, 250: 6990 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
+    pricing: tramos({ 10: 8900, 25: 8500, 50: 7900, 100: 7500, 250: 6990 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF, VINILO], areas: AREAS_PIQUE,
   }),
   product({
     key: "CRMC", handle: "polera-cuello-redondo-manga-corta",
@@ -379,7 +403,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Polerón cuello redondo en mezcla algodón-poliéster, suave por dentro y resistente al uso diario. El básico de invierno que une comodidad y marca.",
     material: "70% algodón · 30% poliéster", tallas: "XS a 3XL", plazo: "A confirmar al cotizar", leadDays: 7, modalidad: "Stock express", baseCostUsd: 10,
     colors: ["Gris", "Negro", "Azul marino", "Azulino", "Blanco", "Rojo", "Naranjo", "Beige", "Lila", "Rosado", "Verde"],
-    pricing: tramos({ 10: 9500, 25: 8990, 50: 8500, 100: 7990, 250: 7500 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
+    pricing: tramos({ 10: 9500, 25: 8990, 50: 8500, 100: 7990, 250: 7500 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF, VINILO], areas: AREAS_POLERON,
   }),
   product({
     key: "CANGURO", handle: "poleron-canguro",
@@ -387,7 +411,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Hoodie con bolsillo canguro y gorro, el favorito de startups, universidades y equipos jóvenes. Amplio lienzo al frente y la espalda para tu logo.",
     material: "70% algodón · 20% poliéster", tallas: "Talla 6 a 3XL", plazo: "3 a 7 días hábiles", leadDays: 7, modalidad: "Stock express", baseCostUsd: 11,
     colors: ["Azul marino", "Negro", "Gris", "Blanco", "Azulino", "Celeste", "Rojo", "Morado", "Naranjo", "Amarillo", "Rosado", "Fucsia", "Verde agua", "Verde manzana", "Verde militar", "Beige"],
-    pricing: tramos({ 10: 10990, 25: 10500, 50: 9990, 100: 9500, 250: 8500 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
+    pricing: tramos({ 10: 10990, 25: 10500, 50: 9990, 100: 9500, 250: 8500 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF, VINILO], areas: AREAS_POLERON,
   }),
   product({
     key: "CIERRE", handle: "poleron-cierre-gorro",
@@ -395,7 +419,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Polerón con cierre completo y gorro. Versátil para el uniforme diario y cómodo de poner y sacar; bordado al pecho impecable.",
     material: "70% algodón · 30% poliéster", tallas: "XS a 3XL", plazo: "3 a 5 días", leadDays: 5, modalidad: "Stock express", baseCostUsd: 11,
     colors: ["Negro", "Azulino", "Azul marino", "Gris", "Rojo"],
-    pricing: tramos({ 10: 11500, 25: 10990, 50: 10500, 100: 9990, 250: 8990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
+    pricing: tramos({ 10: 11500, 25: 10990, 50: 10500, 100: 9990, 250: 8990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF, VINILO], areas: AREAS_POLERON,
   }),
 
   // === Camisas y Blusas ====================================================
@@ -455,7 +479,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Softshell de hombre cortaviento y repelente al agua, con interior abrigado. La chaqueta técnica para gerencia y terreno.",
     material: "A confirmar al cotizar", tallas: "S a 3XL", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 16,
     colors: ["Azul marino", "Negro", "Rojo", "Gris"],
-    pricing: tramos({ 10: 22990, 25: 22500, 50: 21990, 100: 20990, 250: 19990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
+    pricing: tramos({ 10: 22990, 25: 22500, 50: 21990, 100: 20990, 250: 19990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_SOFTSHELL,
   }),
   product({
     key: "SSHM", handle: "softshell-mujer",
@@ -464,7 +488,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     material: "A confirmar al cotizar", tallas: "S a 3XL", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 16,
     nota: "Disponible hombre y mujer",
     colors: ["Negro", "Azul", "Rojo", "Gris"],
-    pricing: tramos({ 10: 22500, 25: 21990, 50: 21500, 100: 20500, 250: 19500 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
+    pricing: tramos({ 10: 22500, 25: 21990, 50: 21500, 100: 20500, 250: 19500 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_SOFTSHELL,
   }),
   product({
     key: "SSSV", handle: "softshell-sin-manga",
@@ -472,7 +496,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Softshell sin mangas: abrigo cortaviento para el torso sin restar movilidad. Ideal como capa media del uniforme.",
     material: "A confirmar al cotizar", tallas: "S a 2XL", plazo: "3 a 5 días", leadDays: 5, modalidad: "Stock express", baseCostUsd: 14,
     colors: ["Negro", "Rojo", "Azul", "Gris"],
-    pricing: tramos({ 10: 21500, 25: 20500, 50: 19500, 100: 18900 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ, PECHO_CENTRO, ESPALDA],
+    pricing: tramos({ 10: 21500, 25: 20500, 50: 19500, 100: 18900 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ, PECHO_CENTRO, ESPALDA_SOFTSHELL],
   }),
   product({
     key: "CORTAV", handle: "cortavientos",
@@ -481,7 +505,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     material: "Taslan", tallas: "XS a 2XL", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock express", baseCostUsd: 10,
     nota: "Elige hombre, mujer o unisex",
     colors: ["Azul marino", "Azulino", "Blanco", "Verde", "Rojo", "Negro"],
-    pricing: tramos({ 10: 15990, 25: 15500, 50: 14990, 100: 14500 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF], areas: AREAS_CAMISA,
+    pricing: tramos({ 10: 15990, 25: 15500, 50: 14990, 100: 14500 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF], areas: AREAS_SOFTSHELL,
   }),
 
   // === Jockeys, Gorros y Accesorios ========================================

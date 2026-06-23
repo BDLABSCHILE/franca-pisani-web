@@ -307,25 +307,32 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
   };
 
   /**
-   * Límite de arrastre: mantiene el logo dentro del rect del área imprimible.
-   * Konva entrega/espera la posición en coordenadas absolutas (ya escaladas
-   * por el Stage), por eso multiplicamos por `scale`. Con rotación usamos el
-   * rect sin rotar como aproximación — suficiente para logos corporativos.
+   * Límite de arrastre: libre dentro de TODO el canvas (la imagen del
+   * producto). El cliente puede mover el logo donde quiera para previsualizar
+   * cómo se vería; el área imprimible queda como guía visual (rect punteado),
+   * no como restricción. La zona seleccionada sigue definiendo precio y
+   * tamaño máximo en cm reales que se aplica al confeccionar.
    */
   const dragBound = (pos: Konva.Vector2d): Konva.Vector2d => {
-    if (!printRect) return pos;
     const node = logoRef.current;
     const w = (node?.width() ?? logoBox?.width ?? 0) * scale;
     const h = (node?.height() ?? logoBox?.height ?? 0) * scale;
-    const minX = printRect.x * scale;
-    const maxX = (printRect.x + printRect.width) * scale - w;
-    const minY = printRect.y * scale;
-    const maxY = (printRect.y + printRect.height) * scale - h;
+    const minX = 0;
+    const maxX = CANVAS_SIZE * scale - w;
+    const minY = 0;
+    const maxY = CANVAS_SIZE * scale - h;
     return {
       x: clampValue(pos.x, minX, maxX),
       y: clampValue(pos.y, minY, maxY),
     };
   };
+
+  /** Límite "blando": solo evita que el logo se vaya del canvas (no del área). */
+  const clampToCanvas = (box: LogoBox): LogoBox => ({
+    ...box,
+    x: clampValue(box.x, 0, CANVAS_SIZE - box.width),
+    y: clampValue(box.y, 0, CANVAS_SIZE - box.height),
+  });
 
   const updateLiveCm = () => {
     const node = logoRef.current;
@@ -451,9 +458,7 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
                   onDragEnd={(e) => {
                     endAdjusting();
                     const moved = { ...logoBox, x: e.target.x(), y: e.target.y() };
-                    setLogoBox(
-                      printRect ? clampBoxToRect(moved, printRect, maxLogoPx) : moved,
-                    );
+                    setLogoBox(clampToCanvas(moved));
                   }}
                   onTransformStart={() => setIsAdjusting(true)}
                   onTransform={updateLiveCm}
@@ -472,9 +477,7 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
                       height: Math.max(20, node.height() * scaleY),
                       rotation: node.rotation(),
                     };
-                    setLogoBox(
-                      printRect ? clampBoxToRect(next, printRect, maxLogoPx) : next,
-                    );
+                    setLogoBox(clampToCanvas(next));
                   }}
                 />
                 <Transformer
@@ -494,17 +497,12 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
                     "bottom-right",
                   ]}
                   boundBoxFunc={(oldBox, newBox) => {
-                    // Mínimo legible para no colapsar el logo a 0.
+                    // Mínimo legible para no colapsar el logo a 0. El tamaño
+                    // máximo del área se muestra en el badge como referencia
+                    // (máx X×Y cm) pero NO se aplica como restricción: el
+                    // cliente puede mover y dimensionar libremente para
+                    // previsualizar; en producción se respeta el máximo real.
                     if (newBox.width < 20 || newBox.height < 20) return oldBox;
-                    // Máximo según los cm imprimibles del área (px absolutos
-                    // del viewport = px del Stage × scale del container).
-                    if (maxLogoPx) {
-                      const maxW = maxLogoPx.w * scale;
-                      const maxH = maxLogoPx.h * scale;
-                      if (Math.abs(newBox.width) > maxW || Math.abs(newBox.height) > maxH) {
-                        return oldBox;
-                      }
-                    }
                     return newBox;
                   }}
                 />
