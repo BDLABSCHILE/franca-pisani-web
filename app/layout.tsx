@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Archivo, Inter } from "next/font/google";
 import { BrandHeader } from "@/components/brand/BrandHeader";
 import { BrandFooter } from "@/components/brand/BrandFooter";
+import { WhatsAppFloat } from "@/components/brand/WhatsAppFloat";
 import "./globals.css";
 
 const archivo = Archivo({
@@ -69,6 +70,7 @@ export default function RootLayout({
         <BrandHeader />
         <main className="flex-1">{children}</main>
         <BrandFooter />
+        <WhatsAppFloat />
       </body>
     </html>
   );
