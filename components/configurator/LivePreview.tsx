@@ -35,8 +35,9 @@ type Props = {
   logoUrl: string | null;
   /**
    * Color hex (#RRGGBB) para teñir la foto del producto según la variante
-   * seleccionada. Se aplica como overlay con `mix-blend-mode: color` —
-   * preserva luminosidad y sombras de la foto base. Null = sin tinte.
+   * seleccionada. Se aplica como overlay con `mix-blend-mode: multiply` sobre
+   * la foto base crema/blanca: el blanco toma el color exacto y las sombras
+   * horneadas dan volumen. Null = sin tinte.
    */
   tintColor?: string | null;
 };
@@ -428,47 +429,32 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
           />
 
           {tintColor && (
-            <>
-              {/* multiply suave (40%) — aporta saturación sin oscurecer demasiado
-                  las prendas que ya son oscuras (navy, negro). */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0 transition-colors duration-200"
-                style={{
-                  backgroundColor: tintColor,
-                  mixBlendMode: "multiply",
-                  opacity: 0.4,
-                  WebkitMaskImage: `url("${activeImageUrl}")`,
-                  maskImage: `url("${activeImageUrl}")`,
-                  WebkitMaskSize: "contain",
-                  maskSize: "contain",
-                  WebkitMaskPosition: "center",
-                  maskPosition: "center",
-                  WebkitMaskRepeat: "no-repeat",
-                  maskRepeat: "no-repeat",
-                }}
-              />
-              {/* color (80%) — sustituye el matiz preservando luminosidad,
-                  hace que prendas blancas tomen tono saturado y no se queden
-                  con un rosa pastel desangelado. */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0 transition-colors duration-200"
-                style={{
-                  backgroundColor: tintColor,
-                  mixBlendMode: "color",
-                  opacity: 0.8,
-                  WebkitMaskImage: `url("${activeImageUrl}")`,
-                  maskImage: `url("${activeImageUrl}")`,
-                  WebkitMaskSize: "contain",
-                  maskSize: "contain",
-                  WebkitMaskPosition: "center",
-                  maskPosition: "center",
-                  WebkitMaskRepeat: "no-repeat",
-                  maskRepeat: "no-repeat",
-                }}
-              />
-            </>
+            /* multiply puro sobre la foto base crema/blanca: blanco × color =
+               color exacto, y las sombras horneadas en la foto (ghost-mannequin)
+               oscurecen el tono proporcionalmente → la prenda toma el color real
+               de la variante con volumen y pliegues, sin lavar el matiz. La
+               máscara con la MISMA foto limita el tinte al cutout opaco, así el
+               fondo gris del container queda intacto. */
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 transition-colors duration-200"
+              style={{
+                backgroundColor: tintColor,
+                mixBlendMode: "multiply",
+                WebkitMaskImage: `url("${activeImageUrl}")`,
+                maskImage: `url("${activeImageUrl}")`,
+                // CLAVE: usar el canal alpha del cutout como máscara, no la
+                // luminancia (default `match-source` la diluiría y el multiply
+                // saldría lavado/rosa en vez del color pleno).
+                maskMode: "alpha",
+                WebkitMaskSize: "contain",
+                maskSize: "contain",
+                WebkitMaskPosition: "center",
+                maskPosition: "center",
+                WebkitMaskRepeat: "no-repeat",
+                maskRepeat: "no-repeat",
+              }}
+            />
           )}
         </div>
 

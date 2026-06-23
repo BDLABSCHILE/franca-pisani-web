@@ -2,9 +2,10 @@
  * Mapeo nombre de color (los que usa la marca en `selectedOptions.value`)
  * → hex CSS, para teñir la foto del producto cuando el usuario selecciona
  * una variante en el configurador. El tinte se aplica como overlay con
- * `mix-blend-mode: color`: preserva la luminosidad y sombras de la foto
- * original y reemplaza solo el matiz, así la prenda toma el color y el
- * fondo gris claro queda casi intacto.
+ * `mix-blend-mode: multiply` sobre las fotos base crema/blanca: blanco ×
+ * color = color exacto, y las sombras horneadas en la foto oscurecen el tono
+ * proporcionalmente, así la prenda toma el color real con volumen y el fondo
+ * gris claro queda intacto (la máscara limita el tinte al cutout).
  *
  * Calibración: hex elegidos para que el resultado visual sea reconocible,
  * no necesariamente Pantone exacto. Es una aproximación — la marca va a
