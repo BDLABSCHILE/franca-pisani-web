@@ -412,36 +412,65 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
         ref={containerRef}
         className="relative mx-auto aspect-square w-full overflow-hidden rounded-rpc-card bg-rpc-image-bg-light"
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={activeImageUrl}
-          alt={productImage.altText ?? "Producto"}
-          className="absolute inset-0 h-full w-full object-contain"
-          draggable={false}
-        />
+        {/* Foto del producto + tinte de color: el wrapper `isolate` aísla el
+            blend mode del fondo gris del container. Los overlays de tinte
+            usan `mask-image` con la MISMA foto del producto, así el color
+            sólo se renderiza donde la prenda es opaca (cutout transparente).
+            Resultado: la prenda toma el color de la variante con sombras
+            preservadas (multiply + color) y el fondo gris queda intacto. */}
+        <div className="absolute inset-0 isolate">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={activeImageUrl}
+            alt={productImage.altText ?? "Producto"}
+            className="absolute inset-0 h-full w-full object-contain"
+            draggable={false}
+          />
 
-        {/* Tinte de color según la variante seleccionada. Dos overlays
-            combinados para que el resultado se vea natural sobre cualquier
-            foto base (blanca, gris, navy):
-            - `multiply` oscurece y aporta saturación → polera blanca + rojo
-              queda roja saturada (no rosa).
-            - `color` encima ajusta el matiz para que tonos parecidos al
-              original no queden lavados.
-            Aproximación visual hasta que lleguen las fotos reales por color. */}
-        {tintColor && (
-          <>
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 transition-colors duration-200"
-              style={{ backgroundColor: tintColor, mixBlendMode: "multiply" }}
-            />
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 transition-colors duration-200"
-              style={{ backgroundColor: tintColor, mixBlendMode: "color", opacity: 0.6 }}
-            />
-          </>
-        )}
+          {tintColor && (
+            <>
+              {/* multiply suave (40%) — aporta saturación sin oscurecer demasiado
+                  las prendas que ya son oscuras (navy, negro). */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 transition-colors duration-200"
+                style={{
+                  backgroundColor: tintColor,
+                  mixBlendMode: "multiply",
+                  opacity: 0.4,
+                  WebkitMaskImage: `url("${activeImageUrl}")`,
+                  maskImage: `url("${activeImageUrl}")`,
+                  WebkitMaskSize: "contain",
+                  maskSize: "contain",
+                  WebkitMaskPosition: "center",
+                  maskPosition: "center",
+                  WebkitMaskRepeat: "no-repeat",
+                  maskRepeat: "no-repeat",
+                }}
+              />
+              {/* color (80%) — sustituye el matiz preservando luminosidad,
+                  hace que prendas blancas tomen tono saturado y no se queden
+                  con un rosa pastel desangelado. */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 transition-colors duration-200"
+                style={{
+                  backgroundColor: tintColor,
+                  mixBlendMode: "color",
+                  opacity: 0.8,
+                  WebkitMaskImage: `url("${activeImageUrl}")`,
+                  maskImage: `url("${activeImageUrl}")`,
+                  WebkitMaskSize: "contain",
+                  maskSize: "contain",
+                  WebkitMaskPosition: "center",
+                  maskPosition: "center",
+                  WebkitMaskRepeat: "no-repeat",
+                  maskRepeat: "no-repeat",
+                }}
+              />
+            </>
+          )}
+        </div>
 
         <Stage
           width={containerSize}

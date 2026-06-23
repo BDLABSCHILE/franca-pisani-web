@@ -23,15 +23,24 @@ type LogoPos = {
 
 function logoPositionFor(category: string): LogoPos {
   if (category === "Pantalones") {
-    // Muslo izquierdo, chico — como una etiqueta lateral.
-    return { top: "44%", left: "38%", width: "12%" };
+    // Muslo izquierdo del pantalón: más arriba (cerca de la cintura) y
+    // adentro de la prenda, no en el borde lateral.
+    return { top: "38%", left: "44%", width: "10%" };
+  }
+  if (category === "Camisas y Blusas") {
+    // Pecho izquierdo (como bordado de uniforme corporativo), no al centro.
+    return { top: "32%", left: "40%", width: "12%" };
+  }
+  if (category === "Ropa Técnica y Cortavientos") {
+    // Mismo criterio que camisas: pecho izquierdo.
+    return { top: "32%", left: "40%", width: "12%" };
   }
   if (category === "Jockeys, Gorros y Accesorios") {
     // Frente del gorro: más arriba y centrado.
     return { top: "40%", left: "50%", width: "16%" };
   }
-  // Default — poleras, polerones, camisas, softshell, pecheras, mandiles,
-  // chaqueta chef, cofia: centro-pecho.
+  // Default — poleras, polerones, pecheras, mandiles, chaqueta chef, cofia:
+  // centro-pecho (donde típicamente va el estampado grande / pechera completa).
   return { top: "42%", left: "50%", width: "22%" };
 }
 
