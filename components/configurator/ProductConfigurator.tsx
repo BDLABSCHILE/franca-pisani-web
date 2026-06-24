@@ -14,16 +14,12 @@ import { PricingPanel } from "./PricingPanel";
 import { StockAnalysis } from "./StockAnalysis";
 import { LogoUploader, type LogoState } from "./LogoUploader";
 import { LivePreview, type LivePreviewHandle } from "./LivePreview";
-import { WorkScrollOverlay } from "./WorkScrollOverlay";
 import { tintForColor } from "@/lib/brand/color-tints";
 import { AddToQuoteButton } from "./AddToQuoteButton";
-import type { RealWork } from "@/lib/works/works";
 
 type Props = {
   product: CorporateProduct;
   inventoryByVariantId: Record<string, number>;
-  /** Trabajos reales con esta prenda — se revelan sobre el preview al scrollear. */
-  works: readonly RealWork[];
 };
 
 function defaultRequiredDateIso(): string {
@@ -35,7 +31,6 @@ function defaultRequiredDateIso(): string {
 export function ProductConfigurator({
   product,
   inventoryByVariantId,
-  works,
 }: Props) {
   const firstVariant = product.variants[0];
   const firstArea = product.printAreas[0];
@@ -86,10 +81,6 @@ export function ProductConfigurator({
   // Ref al LivePreview para capturar el mockup compuesto (producto + logo)
   // al momento de agregar la línea al carrito. Ver LivePreviewHandle.
   const previewRef = useRef<LivePreviewHandle | null>(null);
-
-  // Ref al grid completo: el WorkScrollOverlay lo usa para medir cuánto se
-  // scrolleó mientras el preview está pineado y revelar los trabajos.
-  const gridRef = useRef<HTMLDivElement | null>(null);
 
   const selectedVariant = useMemo(
     () => product.variants.find((v) => v.id === variantId) ?? firstVariant ?? null,
@@ -170,13 +161,11 @@ export function ProductConfigurator({
   }, [selectedArea, selectedVariant, product]);
 
   return (
-    <div
-      ref={gridRef}
-      className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16"
-    >
-      {/* Columna izquierda: preview Konva sticky. `relative` para anclar el
-          overlay de trabajos reales sobre el cuadro del preview. */}
-      <div className="relative lg:sticky lg:top-24 lg:self-start">
+    <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+      {/* Columna izquierda: preview Konva sticky. Siempre muestra la foto del
+          producto que se está viendo (la prueba social va en la sección
+          "Así se ve con un logo" más abajo, no sobre el preview). */}
+      <div className="lg:sticky lg:top-24 lg:self-start">
         <LivePreview
           ref={previewRef}
           productImage={previewImage}
@@ -188,9 +177,6 @@ export function ProductConfigurator({
             selectedVariant?.selectedOptions.find((o) => o.name === "Color")?.value,
           )}
         />
-        {/* Al scrollear, los trabajos reales con esta prenda aparecen sobre el
-            preview (solo lg+ y si hay trabajos). */}
-        <WorkScrollOverlay works={works} containerRef={gridRef} />
       </div>
 
       {/* Columna derecha: logo + selectores + pricing + stock */}
