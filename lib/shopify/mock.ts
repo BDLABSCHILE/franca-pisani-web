@@ -173,6 +173,14 @@ function placeholderImage(label: string, width = 1200, height = 1200): ShopifyIm
  * corresponde a esa zona (frente / espalda / lateral) — el LivePreview cambia
  * la foto al seleccionarla. Si la URL empieza con `/products/...` el
  * ProductConfigurator la usa; si es placeholder, cae al featured image.
+ *
+ * TODO CALIBRACIÓN (cuando lleguen las fotos REALES): hoy `areaPolygon` y los
+ * máximos en cm son ESTIMACIONES sobre fotos placeholder, y varias zonas
+ * (pecho/manga/gorro) son una sola constante compartida por todas las prendas.
+ * El LivePreview deriva la escala px↔cm del polígono para ser consistente,
+ * pero NO es fiel a la prenda real. Para calibrar: por cada foto real medir un
+ * ancho conocido (ej. ancho de la polera) y ajustar `areaPolygon` +
+ * `maxWidthCm/maxHeightCm` por producto. `pxPerCm` quedó como fallback.
  */
 const area = (
   id: string,

@@ -296,11 +296,34 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
     };
   }, [area, productImg, productImage]);
 
+  /**
+   * Escala px↔cm DERIVADA del área imprimible: hacemos que el polígono
+   * represente exactamente maxWidthCm × maxHeightCm, así el tamaño del badge,
+   * el tope del logo y lo que se ve concuerdan ENTRE SÍ. (Antes el `pxPerCm`
+   * estático no calzaba con el polígono y el badge prometía un máximo que no
+   * correspondía al área — p.ej. "máx 10 cm" sobre un área de ~5 cm.)
+   *
+   * OJO — TODO CALIBRACIÓN: esto es CONSISTENTE pero todavía ESTIMADO sobre
+   * fotos placeholder. Para que el tamaño sea FIEL a la prenda real hay que
+   * calibrar por producto cuando lleguen las fotos reales: medir un ancho
+   * conocido en cada foto y ajustar `areaPolygon` + `maxWidthCm/maxHeightCm`
+   * por zona en mock.ts. `area.pxPerCm` queda solo como fallback.
+   */
+  const pxPerCm = useMemo(() => {
+    if (area && printRect && area.maxWidthCm > 0 && area.maxHeightCm > 0) {
+      return Math.min(
+        printRect.width / area.maxWidthCm,
+        printRect.height / area.maxHeightCm,
+      );
+    }
+    return area?.pxPerCm ?? CANVAS_SIZE / 30;
+  }, [area, printRect]);
+
   /** Tamaño máximo del logo en px del Stage según los cm máximos del área. */
   const maxLogoPx = useMemo(() => {
     if (!area) return null;
-    return { w: area.maxWidthCm * area.pxPerCm, h: area.maxHeightCm * area.pxPerCm };
-  }, [area]);
+    return { w: area.maxWidthCm * pxPerCm, h: area.maxHeightCm * pxPerCm };
+  }, [area, pxPerCm]);
 
   // Coloca el logo al cargarlo o al cambiar de zona; si solo cambió la imagen
   // de fondo (galería), re-encaja la posición actual sin resetear el trabajo
@@ -337,16 +360,16 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
       onLogoSizeChange(null);
       return;
     }
-    onLogoSizeChange(Math.max(logoBox.width, logoBox.height) / area.pxPerCm);
-  }, [logoBox, area, onLogoSizeChange]);
+    onLogoSizeChange(Math.max(logoBox.width, logoBox.height) / pxPerCm);
+  }, [logoBox, area, pxPerCm, onLogoSizeChange]);
 
   const scale = containerSize / CANVAS_SIZE;
 
   const sizeCm =
     area && logoBox
       ? {
-          w: (logoBox.width / area.pxPerCm).toFixed(1),
-          h: (logoBox.height / area.pxPerCm).toFixed(1),
+          w: (logoBox.width / pxPerCm).toFixed(1),
+          h: (logoBox.height / pxPerCm).toFixed(1),
         }
       : null;
 
@@ -390,8 +413,8 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
     const node = logoRef.current;
     if (!node || !area) return;
     setLiveCm({
-      w: ((node.width() * node.scaleX()) / area.pxPerCm).toFixed(1),
-      h: ((node.height() * node.scaleY()) / area.pxPerCm).toFixed(1),
+      w: ((node.width() * node.scaleX()) / pxPerCm).toFixed(1),
+      h: ((node.height() * node.scaleY()) / pxPerCm).toFixed(1),
     });
   };
 
@@ -559,6 +582,11 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
                     transformerRef.current = node;
                   }}
                   rotateEnabled
+                  // keepRatio (default true) + shiftBehavior "none": el logo
+                  // mantiene SIEMPRE su aspecto al redimensionar, incluso si el
+                  // cliente arrastra una esquina con Shift apretado.
+                  keepRatio
+                  shiftBehavior="none"
                   borderStroke={RPC_INFO_HEX}
                   anchorStroke={RPC_INFO_HEX}
                   anchorFill="#ffffff"
@@ -585,17 +613,22 @@ export const LivePreview = forwardRef<LivePreviewHandle, Props>(
           </Layer>
         </Stage>
 
-        {/* Badge flotante con el tamaño real del logo en cm, en vivo. */}
+        {/* Badge flotante con el tamaño del logo en cm, en vivo. El "≈" y la
+            nota "referencial" son a propósito: hasta calibrar con fotos reales,
+            la escala es indicativa, no una medida exacta sobre la prenda. */}
         {shownCm && area && logoImg && (
           <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-rpc-button border border-rpc-info/50 bg-rpc-bg/90 px-3 py-1.5 backdrop-blur">
             <p className="font-rpc-body text-xs tracking-normal text-rpc-text">
               Tu logo:{" "}
               <span className="font-semibold">
-                {shownCm.w} × {shownCm.h} cm
+                ≈ {shownCm.w} × {shownCm.h} cm
               </span>
               <span className="text-rpc-text/55">
                 {" "}— máx {area.maxWidthCm} × {area.maxHeightCm} cm
               </span>
+            </p>
+            <p className="mt-0.5 text-[10px] uppercase tracking-[0.14em] text-rpc-text/45">
+              Tamaño referencial
             </p>
           </div>
         )}
