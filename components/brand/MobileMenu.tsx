@@ -12,6 +12,7 @@ type NavLink = { href: string; label: string };
 const NAV_LINKS: NavLink[] = [
   { href: "/catalogo", label: "Catálogo" },
   { href: "/como-funciona", label: "Cómo funciona" },
+  { href: "/nuestros-trabajos", label: "Nuestros trabajos" },
   { href: "/casos-de-exito", label: "Clientes" },
   { href: "/contacto", label: "Contacto" },
 ];

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Hero } from "@/components/marketing/Hero";
 import { Pillars } from "@/components/marketing/Pillars";
+import { WorksTeaser } from "@/components/marketing/WorksTeaser";
 import { LogoWall } from "@/components/marketing/LogoWall";
 import { SuccessMetrics } from "@/components/marketing/SuccessMetrics";
 import { FaqB2B } from "@/components/marketing/FaqB2B";
@@ -13,6 +14,7 @@ export default function Home() {
       <Hero />
       <Pillars />
       <HowItWorks />
+      <WorksTeaser />
       <LogoWall />
       <SuccessMetrics />
       <FaqB2B />

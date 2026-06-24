@@ -11,6 +11,7 @@ import {
   ColorSwatches,
   type ColorOption,
 } from "@/components/configurator/ColorSwatches";
+import { ProductWorks } from "@/components/works/ProductWorks";
 import { splitModelColor } from "@/lib/utils/product-title";
 
 // La PDP siempre dinámica: stock + metafields cambian, y queremos que el
@@ -110,6 +111,9 @@ export default async function PDPPage({ params }: Props) {
           />
         </section>
       )}
+
+      {/* Trabajos reales en los que aparece esta prenda (si los hay). */}
+      <ProductWorks handle={product.handle} />
     </div>
   );
 }
