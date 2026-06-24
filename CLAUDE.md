@@ -12,4 +12,4 @@ Web corporativa B2B de **Ropa Publicitaria Chile** (Comercial Franca Pisani Ltda
 - **Factor humano:** flujo B2B sin checkout ni pago online. Todo termina en "el equipo te contacta para cerrar".
 - **Marca:** tokens en `lib/brand/rpc-tokens.ts` + `app/globals.css` (coral `rpc-accent` = acción, celeste `rpc-info` = informativo). Contacto real en `lib/brand/contacts.ts`. Logo en `public/brand/rpc-logo.webp` y favicon en `public/brand/rpc-favicon.png`. No inventar otra identidad.
 - **Contratos estables:** tipos en `lib/shopify/types.ts`, `CartLine` en `lib/quote/storage.ts` (no cambiar su shape), store del logo en `lib/logo/store.ts`.
-- **Push y deploy** los hace Benja manualmente; commits locales sí.
+- **Push:** lo hace Claude (Benja lo autorizó 2026-06-23: "tú haz los push"). Push a `main` → Vercel despliega solo. Commitea y pushea sin pedir permiso salvo que Benja diga lo contrario.
