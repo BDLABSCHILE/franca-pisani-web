@@ -32,6 +32,12 @@ export type RealWork = {
   height: number;
   /** Handles del catálogo que aparecen en la foto (para cruce en la PDP). */
   productHandles: readonly string[];
+  /**
+   * Trabajos de generación / egresados (polerones y ropa de curso). Se muestran
+   * destacados como tarjetas grandes arriba de la galería — es un producto con
+   * mucha demanda y vale la pena darle su propio espacio.
+   */
+  featured?: boolean;
 };
 
 /**
@@ -374,6 +380,141 @@ export const REAL_WORKS: readonly RealWork[] = [
     width: 1200,
     height: 1594,
     productHandles: [],
+  },
+  // — Generación / egresados (destacados) —
+  {
+    slug: "grange-school-gen-26",
+    client: "The Grange School",
+    summary: "Polerón de generación 2026, bordado y estampado",
+    detail:
+      "Polerón canguro azul marino para la Generación 2026 de The Grange School: el nombre del colegio bordado al pecho, el apodo de cada quien al frente y la espalda estampada con todos los nombres del curso y la mascota. El clásico polerón de generación que se usa por años.",
+    garments: ["Polerón canguro"],
+    techniques: ["Bordado", "Estampado"],
+    image: "/trabajos/grange-school-gen-26.webp",
+    width: 1200,
+    height: 1600,
+    productHandles: ["poleron-canguro"],
+    featured: true,
+  },
+  {
+    slug: "studi-generacion",
+    client: "Studi",
+    summary: "Polerones de generación con el nombre de cada quien",
+    detail:
+      "Set de generación para Studi: polerones canguro azul marino con el logo al pecho y el nombre de cada integrante estampado a la espalda, más polera blanca y un código QR. Personalización uno a uno, prenda por prenda.",
+    garments: ["Polerón canguro", "Polera"],
+    techniques: ["Estampado"],
+    image: "/trabajos/studi-generacion.webp",
+    width: 1009,
+    height: 1280,
+    productHandles: ["poleron-canguro", "polera-cuello-redondo-manga-corta"],
+    featured: true,
+  },
+  {
+    slug: "grange-school-gen-2023",
+    client: "The Grange School",
+    summary: "Chalecos de generación 2023 con escudo bordado",
+    detail:
+      "Chalecos sin manga acolchados azul marino para la Generación 2023 de The Grange School, con el escudo del colegio bordado al pecho y «GEN 2023». Abrigan sin estorbar — pensados para usar sobre el uniforme.",
+    garments: ["Chaleco sin manga"],
+    techniques: ["Bordado"],
+    image: "/trabajos/grange-school-gen-2023.webp",
+    width: 768,
+    height: 1024,
+    productHandles: [],
+    featured: true,
+  },
+  // — Corporativos (tanda 2026-06-24) —
+  {
+    slug: "petrobras-polera-jockey",
+    client: "Petrobras",
+    summary: "Polera piqué y jockey con logo bordado",
+    detail:
+      "Polera piqué blanca y jockey gris para Petrobras, con el logo BR bordado al pecho y al frente del jockey. El combo clásico de uniforme corporativo: prolijo, sobrio y a juego.",
+    garments: ["Polera piqué", "Jockey"],
+    techniques: ["Bordado"],
+    image: "/trabajos/petrobras-polera-jockey.webp",
+    width: 1200,
+    height: 1033,
+    productHandles: ["polera-pique-cuello-botones-manga-corta", "jockey"],
+  },
+  {
+    slug: "caleta-austral-pique",
+    client: "Caleta Austral",
+    summary: "Poleras piqué en tres colores, logo bordado",
+    detail:
+      "Poleras piqué para Caleta Austral – Mercado del Mar en blanco, azul marino y naranjo, con el logo circular bordado al pecho. Un mismo bordado, parejo en cada color de la prenda.",
+    garments: ["Polera piqué cuello y botones"],
+    techniques: ["Bordado"],
+    image: "/trabajos/caleta-austral-pique.webp",
+    width: 750,
+    height: 726,
+    productHandles: ["polera-pique-cuello-botones-manga-corta"],
+  },
+  {
+    slug: "santo-tomas-softshell",
+    client: "Santo Tomás",
+    summary: "Softshell azul marino con logo bordado",
+    detail:
+      "Softshell azul marino para el Área de Recursos Naturales de Santo Tomás, con el logo bordado al pecho. Cortavientos y abrigador, pensado para trabajo en terreno.",
+    garments: ["Softshell"],
+    techniques: ["Bordado"],
+    image: "/trabajos/santo-tomas-softshell.webp",
+    width: 1200,
+    height: 1500,
+    productHandles: ["softshell-hombre"],
+  },
+  {
+    slug: "wwf-cortavientos",
+    client: "WWF",
+    summary: "Cortavientos «Hazte Socio» estampado",
+    detail:
+      "Cortavientos azul marino para la campaña «Hazte Socio» de WWF, con el panda estampado al pecho. Liviano y plegable, ideal para activaciones y captación en la calle.",
+    garments: ["Cortavientos"],
+    techniques: ["Estampado"],
+    image: "/trabajos/wwf-cortavientos.webp",
+    width: 750,
+    height: 652,
+    productHandles: ["cortavientos"],
+  },
+  {
+    slug: "owens-corning-cargo-chaleco",
+    client: "Owens Corning",
+    summary: "Pantalón cargo y chalecos de trabajo bordados",
+    detail:
+      "Vestuario de terreno para Owens Corning: pantalón cargo forro polar y chalecos sin manga acolchados, con la marca y su mascota bordadas. Ropa de trabajo abrigada y resistente para el día a día.",
+    garments: ["Pantalón cargo", "Chaleco sin manga"],
+    techniques: ["Bordado"],
+    image: "/trabajos/owens-corning-cargo-chaleco.webp",
+    width: 1200,
+    height: 1600,
+    productHandles: ["pantalon-cargo-forro-polar"],
+  },
+  {
+    slug: "gabri-mandil-comedy",
+    client: "Gabrí",
+    summary: "Mandil y lanyards para barra, bordado y estampado",
+    detail:
+      "Mandil corto de poliéster negro y lanyards para Gabrí (Wild Patagonian Gin & Vodka) y Comedy, con las marcas bordadas y estampadas. Parte de la línea de delantales y uniformes que sí fabricamos a medida.",
+    garments: ["Mandil", "Lanyard"],
+    techniques: ["Bordado", "Estampado"],
+    image: "/trabajos/gabri-mandil-comedy.webp",
+    width: 1200,
+    height: 1313,
+    productHandles: ["pechera"],
+  },
+  {
+    slug: "jockeys-trucker-estampados",
+    client: null,
+    summary: "Jockeys trucker bicolor con personaje estampado",
+    detail:
+      "Jockeys trucker azul y blanco, con malla atrás y un personaje estampado al frente. Gorros frescos para merch y eventos de verano.",
+    garments: ["Jockey"],
+    techniques: ["Estampado"],
+    image: "/trabajos/jockeys-trucker-estampados.webp",
+    width: 1200,
+    height: 668,
+    productHandles: ["jockey"],
   },
 ] as const;
 

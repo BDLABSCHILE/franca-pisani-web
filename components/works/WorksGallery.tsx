@@ -26,40 +26,75 @@ type Props = {
 export function WorksGallery({ works, productLinks }: Props) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
+  // Destacados (generación / egresados) van primero, en tarjetas grandes; el
+  // resto en la masonry. El lightbox y prev/next operan sobre este mismo orden.
+  const featured = works.filter((w) => w.featured);
+  const regular = works.filter((w) => !w.featured);
+  const ordered = [...featured, ...regular];
+
   // Deep-link: /nuestros-trabajos#<slug> abre ese trabajo directo (lo usan
   // las tarjetas de la PDP para saltar al detalle exacto).
   useEffect(() => {
     const slug = window.location.hash.replace("#", "");
     if (!slug) return;
-    const i = works.findIndex((w) => w.slug === slug);
+    const i = ordered.findIndex((w) => w.slug === slug);
     if (i !== -1) setOpenIndex(i);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- ordered deriva de works; depender de él reabriría el lightbox en cada render
   }, [works]);
 
   const close = useCallback(() => setOpenIndex(null), []);
   const go = useCallback(
     (dir: 1 | -1) =>
       setOpenIndex((i) =>
-        i === null ? i : (i + dir + works.length) % works.length,
+        i === null ? i : (i + dir + ordered.length) % ordered.length,
       ),
-    [works.length],
+    [ordered.length],
   );
 
   return (
     <>
-      <div className="[column-fill:_balance] gap-5 sm:columns-2 sm:gap-6 lg:columns-3">
-        {works.map((work, i) => (
-          <WorkCard
-            key={work.slug}
-            id={work.slug}
-            work={work}
-            onOpen={() => setOpenIndex(i)}
-          />
-        ))}
-      </div>
+      {featured.length > 0 && (
+        <section className="mb-14 sm:mb-16">
+          <p className="text-xs uppercase tracking-[0.25em] text-rpc-text/60">
+            Generaciones y egresados
+          </p>
+          <h2 className="mt-2 max-w-2xl text-2xl leading-tight sm:text-3xl">
+            Polerones y ropa de generación.
+          </h2>
+          <p className="mt-3 max-w-2xl font-rpc-body text-sm normal-case tracking-normal text-rpc-text/70 sm:text-base">
+            Polerones de curso, chalecos y poleras con el nombre del colegio, la
+            mascota y el de cada integrante de la generación. Los personalizamos
+            uno a uno.
+          </p>
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+            {featured.map((work, i) => (
+              <FeaturedWorkCard
+                key={work.slug}
+                id={work.slug}
+                work={work}
+                onOpen={() => setOpenIndex(i)}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {regular.length > 0 && (
+        <div className="[column-fill:_balance] gap-5 sm:columns-2 sm:gap-6 lg:columns-3">
+          {regular.map((work, j) => (
+            <WorkCard
+              key={work.slug}
+              id={work.slug}
+              work={work}
+              onOpen={() => setOpenIndex(featured.length + j)}
+            />
+          ))}
+        </div>
+      )}
 
       {openIndex !== null && (
         <Lightbox
-          work={works[openIndex]!}
+          work={ordered[openIndex]!}
           productLinks={productLinks}
           onClose={close}
           onPrev={() => go(-1)}
@@ -102,20 +137,69 @@ function WorkCard({
       </div>
 
       <div className="p-5">
-        <div className="flex items-center gap-2">
-          {work.client ? (
-            <span className="font-rpc-heading text-base font-bold leading-tight text-rpc-text">
-              {work.client}
-            </span>
-          ) : (
-            <span className="font-rpc-heading text-base font-bold leading-tight text-rpc-text">
-              Tanda multimarca
-            </span>
-          )}
+        <span className="font-rpc-heading text-base font-bold leading-tight text-rpc-text">
+          {work.client ?? work.summary}
+        </span>
+        {work.client && (
+          <p className="mt-1.5 font-rpc-body text-sm normal-case leading-snug tracking-normal text-rpc-text/70">
+            {work.summary}
+          </p>
+        )}
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {work.techniques.map((t) => (
+            <TechniqueChip key={t} label={t} />
+          ))}
         </div>
-        <p className="mt-1.5 font-rpc-body text-sm normal-case leading-snug tracking-normal text-rpc-text/70">
-          {work.summary}
-        </p>
+      </div>
+    </button>
+  );
+}
+
+/**
+ * Tarjeta destacada para trabajos de generación / egresados. Más grande, con
+ * imagen recortada uniforme y badge de acento — se muestra arriba de la galería.
+ */
+function FeaturedWorkCard({
+  work,
+  onOpen,
+  id,
+}: {
+  work: RealWork;
+  onOpen: () => void;
+  id?: string;
+}) {
+  return (
+    <button
+      type="button"
+      id={id}
+      onClick={onOpen}
+      className="group flex scroll-mt-24 flex-col overflow-hidden rounded-rpc-card border border-rpc-accent/30 bg-rpc-surface text-left shadow-sm ring-1 ring-rpc-accent/10 transition hover:border-rpc-accent/60 hover:shadow-md"
+    >
+      <div className="relative aspect-[4/5] overflow-hidden bg-rpc-image-bg-light">
+        <Image
+          src={work.image}
+          alt={`${work.garments.join(", ")}${work.client ? ` para ${work.client}` : ""} — ${work.techniques.join(" + ")}`}
+          fill
+          sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 100vw"
+          className="object-cover transition duration-500 group-hover:scale-[1.03]"
+        />
+        <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-rpc-accent px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white shadow-sm">
+          Generación
+        </span>
+        <span className="pointer-events-none absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-rpc-bg/85 text-rpc-text opacity-0 shadow-sm backdrop-blur transition group-hover:opacity-100">
+          <ExpandIcon className="h-4 w-4" />
+        </span>
+      </div>
+
+      <div className="flex flex-1 flex-col p-5">
+        <span className="font-rpc-heading text-lg font-bold leading-tight text-rpc-text">
+          {work.client ?? work.summary}
+        </span>
+        {work.client && (
+          <p className="mt-1.5 font-rpc-body text-sm normal-case leading-snug tracking-normal text-rpc-text/70">
+            {work.summary}
+          </p>
+        )}
         <div className="mt-3 flex flex-wrap gap-1.5">
           {work.techniques.map((t) => (
             <TechniqueChip key={t} label={t} />
@@ -202,7 +286,7 @@ function Lightbox({
               Trabajo real
             </p>
             <h2 className="mt-2 font-rpc-heading text-2xl font-bold leading-tight text-rpc-text">
-              {work.client ?? "Tanda multimarca"}
+              {work.client ?? work.summary}
             </h2>
           </div>
 

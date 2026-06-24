@@ -113,7 +113,7 @@ export function WorkScrollOverlay({ works, containerRef }: Props) {
             </span>
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-rpc-text/85 via-rpc-text/35 to-transparent p-4 pt-12">
               <p className="font-rpc-heading text-base font-bold leading-tight text-white">
-                {w.client ?? "Tanda multimarca"}
+                {w.client ?? w.summary}
               </p>
               <p className="mt-0.5 font-rpc-body text-xs normal-case tracking-normal text-white/85">
                 {w.garments.join(" · ")} — {w.techniques.join(" + ")}
