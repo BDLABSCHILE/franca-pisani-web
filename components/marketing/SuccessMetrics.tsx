@@ -1,13 +1,14 @@
 /**
  * Cifras defendibles de Ropa Publicitaria Chile — SOLO claims permitidos:
- * 40+ años (desde 1982), modelo dual, respuesta <24 h y las 30+ marcas
- * del muro de clientes. Nada inventado.
+ * +40 años (desde 1982), modelo dual, respuesta <24 h y las +500 empresas
+ * que han confiado (claim aprobado por la marca, mismo que en /nuestros-trabajos).
+ * Nada inventado.
  */
 const METRICS = [
-  { value: "40+", label: "años de experiencia, desde 1982" },
+  { value: "+40", label: "años de experiencia, desde 1982" },
   { value: "2 modos", label: "stock para personalizar y fabricación propia de cocina" },
   { value: "<24 h", label: "tiempo de respuesta a tu cotización" },
-  { value: "30+", label: "marcas nos avalan" },
+  { value: "+500", label: "empresas confían en nosotros" },
 ] as const;
 
 export function SuccessMetrics() {

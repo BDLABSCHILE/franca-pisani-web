@@ -113,10 +113,10 @@ export function Hero() {
             )}
           </div>
 
-          {/* Rombo coral con los 40+ años, montado sobre la esquina */}
+          {/* Rombo coral con los +40 años, montado sobre la esquina */}
           <div className="absolute -bottom-5 -left-5 flex h-24 w-24 rotate-45 items-center justify-center rounded-[20px] bg-rpc-accent shadow-xl shadow-rpc-accent/30">
             <p className="-rotate-45 text-center font-rpc-heading leading-none text-white">
-              <span className="block text-2xl font-bold">40+</span>
+              <span className="block text-2xl font-bold">+40</span>
               <span className="mt-1 block text-[10px] font-semibold uppercase tracking-wide">años</span>
             </p>
           </div>
