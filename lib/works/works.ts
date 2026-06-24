@@ -32,12 +32,6 @@ export type RealWork = {
   height: number;
   /** Handles del catálogo que aparecen en la foto (para cruce en la PDP). */
   productHandles: readonly string[];
-  /**
-   * Trabajos de generación / egresados (polerones y ropa de curso). Se muestran
-   * destacados como tarjetas grandes arriba de la galería — es un producto con
-   * mucha demanda y vale la pena darle su propio espacio.
-   */
-  featured?: boolean;
 };
 
 /**
@@ -393,9 +387,7 @@ export const REAL_WORKS: readonly RealWork[] = [
     image: "/trabajos/grange-school-gen-26.webp",
     width: 1200,
     height: 1600,
-    productHandles: ["poleron-canguro"],
-    featured: true,
-  },
+    productHandles: ["poleron-canguro"],  },
   {
     slug: "studi-generacion",
     client: "Studi",
@@ -407,9 +399,7 @@ export const REAL_WORKS: readonly RealWork[] = [
     image: "/trabajos/studi-generacion.webp",
     width: 1009,
     height: 1280,
-    productHandles: ["poleron-canguro", "polera-cuello-redondo-manga-corta"],
-    featured: true,
-  },
+    productHandles: ["poleron-canguro", "polera-cuello-redondo-manga-corta"],  },
   {
     slug: "grange-school-gen-2023",
     client: "The Grange School",
@@ -421,9 +411,7 @@ export const REAL_WORKS: readonly RealWork[] = [
     image: "/trabajos/grange-school-gen-2023.webp",
     width: 768,
     height: 1024,
-    productHandles: [],
-    featured: true,
-  },
+    productHandles: [],  },
   // — Corporativos (tanda 2026-06-24) —
   {
     slug: "petrobras-polera-jockey",
