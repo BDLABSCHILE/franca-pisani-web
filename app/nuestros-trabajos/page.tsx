@@ -73,7 +73,7 @@ export default async function NuestrosTrabajosPage() {
           <dl className="mt-10 flex flex-wrap gap-x-12 gap-y-6 sm:mt-12">
             <Stat value="+500" label="empresas confían en nosotros" />
             <Stat value="+40" label="años de oficio" />
-            <Stat value="<24 h" label="respondemos tu cotización" />
+            <Stat value="24 h" label="respuesta en menos de 24 horas" />
           </dl>
         </div>
       </section>
