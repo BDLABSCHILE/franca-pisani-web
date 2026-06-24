@@ -68,9 +68,9 @@ export const REAL_WORKS: readonly RealWork[] = [
   {
     slug: "mcdonalds-mcdelivery",
     client: "McDonald's",
-    summary: "Uniforme McDelivery: cortavientos, polos y polar",
+    summary: "Uniforme McDelivery: cortavientos, poleras y polar",
     detail:
-      "Programa para McDonald's / McDelivery: cortavientos negro estampado, polar y polos piqué (azul, verde, gris) con los arcos dorados bordados, más camisa con el sello McDelivery. Bordado y estampado conviviendo en un mismo uniforme.",
+      "Programa para McDonald's / McDelivery: cortavientos negro estampado, polar y poleras piqué (azul, verde, gris) con los arcos dorados bordados, más camisa con el sello McDelivery. Bordado y estampado conviviendo en un mismo uniforme.",
     garments: ["Cortavientos", "Polera piqué", "Polar", "Camisa"],
     techniques: ["Bordado", "Estampado"],
     image: "/trabajos/mcdonalds-mcdelivery.webp",
@@ -231,15 +231,15 @@ export const REAL_WORKS: readonly RealWork[] = [
   {
     slug: "bice-ventures-poleron",
     client: "BICE Ventures",
-    summary: "Polerones negros estampados para tres marcas BICE",
+    summary: "Poleras negras estampadas para tres marcas BICE",
     detail:
-      "Polerones polo negros para el ecosistema BICE Ventures: estampados de BICE Ventures, amparo id y beliv (by BICE). Una identidad por equipo, misma prenda base.",
-    garments: ["Polerón polo cuello redondo"],
+      "Poleras negras para el ecosistema BICE Ventures: estampados de BICE Ventures, amparo id y beliv (by BICE). Una identidad por equipo, misma prenda base.",
+    garments: ["Polera cuello redondo"],
     techniques: ["Estampado"],
     image: "/trabajos/bice-ventures-poleron.webp",
     width: 1200,
     height: 1204,
-    productHandles: ["poleron-polo-cuello-redondo"],
+    productHandles: ["polera-cuello-redondo-manga-corta"],
   },
   {
     slug: "maz-honda-pique",
@@ -352,15 +352,15 @@ export const REAL_WORKS: readonly RealWork[] = [
   {
     slug: "malls-poleron-polo",
     client: "Malls",
-    summary: "Polerones para Mall Marina, Curicó y más",
+    summary: "Poleras para Mall Marina, Curicó y más",
     detail:
-      "Polerones polo negros para varios centros comerciales —Mall Marina, Mall Curicó, Mall Barrio Independencia y MallCentro— cada uno con su logo estampado. Una misma prenda, varias marcas de un mismo grupo.",
-    garments: ["Polerón polo cuello redondo"],
+      "Poleras negras para varios centros comerciales —Mall Marina, Mall Curicó, Mall Barrio Independencia y MallCentro— cada uno con su logo estampado. Una misma prenda, varias marcas de un mismo grupo.",
+    garments: ["Polera cuello redondo"],
     techniques: ["Estampado"],
     image: "/trabajos/malls-poleron-polo.webp",
     width: 1200,
     height: 878,
-    productHandles: ["poleron-polo-cuello-redondo"],
+    productHandles: ["polera-cuello-redondo-manga-corta"],
   },
   {
     slug: "bolsas-lona-personalizadas",
