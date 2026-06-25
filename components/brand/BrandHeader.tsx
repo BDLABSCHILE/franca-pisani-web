@@ -14,15 +14,10 @@ const NAV_LINKS = [
 export function BrandHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-rpc-border bg-rpc-bg/95 backdrop-blur">
-      {/*
-        Announcement bar — ÚNICA mención demo de todo el sitio.
-        Es una vista previa para el cliente: catálogo y precios son de
-        referencia hasta conectar su Shopify real.
-      */}
+      {/* Announcement bar — mensaje comercial fijo en el tope del sitio. */}
       <p className="flex items-center justify-center gap-2 bg-rpc-announcement px-4 py-1.5 text-center text-[11px] leading-snug text-white sm:text-xs">
         <span aria-hidden className="inline-block h-1.5 w-1.5 shrink-0 rotate-45 bg-rpc-accent" />
-        Vista previa para el cliente — precios de referencia que se confirman al
-        cotizar
+        Envíos a todo Chile · Pedidos desde 10 unidades
       </p>
 
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-6 lg:px-10">
