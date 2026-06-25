@@ -379,15 +379,16 @@ export const REAL_WORKS: readonly RealWork[] = [
   {
     slug: "grange-school-gen-26",
     client: "The Grange School",
-    summary: "Polerón de generación 2026, bordado y estampado",
+    summary: "Polerón de generación 2026, todo bordado",
     detail:
-      "Polerón canguro azul marino para la Generación 2026 de The Grange School: el nombre del colegio bordado al pecho, el apodo de cada quien al frente y la espalda estampada con todos los nombres del curso y la mascota. El clásico polerón de generación que se usa por años.",
+      "Polerón canguro azul marino para la Generación 2026 de The Grange School: el nombre del colegio al pecho, el apodo de cada quien al frente y la espalda con todos los nombres del curso y la mascota — todo bordado. El clásico polerón de generación que se usa por años.",
     garments: ["Polerón canguro"],
-    techniques: ["Bordado", "Estampado"],
+    techniques: ["Bordado"],
     image: "/trabajos/grange-school-gen-26.webp",
     width: 1200,
     height: 1600,
-    productHandles: ["poleron-canguro"],  },
+    productHandles: ["poleron-canguro"],
+  },
   {
     slug: "studi-generacion",
     client: "Studi",
@@ -503,6 +504,45 @@ export const REAL_WORKS: readonly RealWork[] = [
     width: 1200,
     height: 668,
     productHandles: ["jockey"],
+  },
+  {
+    slug: "cool-price-jockeys",
+    client: "Cool Price",
+    summary: "Jockeys rojos con logo bordado",
+    detail:
+      "Jockeys rojos para Cool Price con el logo circular bordado al frente en hilo blanco. Bordado prolijo y durable para una tanda completa de gorros.",
+    garments: ["Jockey"],
+    techniques: ["Bordado"],
+    image: "/trabajos/cool-price-jockeys.webp",
+    width: 1200,
+    height: 1494,
+    productHandles: ["jockey"],
+  },
+  {
+    slug: "klog-poleron-dtf",
+    client: "Klog.co",
+    summary: "Polerón canguro blanco con estampado full color DTF",
+    detail:
+      "Polerón canguro blanco para Klog.co: el logo al pecho, una ilustración a todo color en el bolsillo y un gran diseño en DTF a la espalda con el logo «KLOG.CO». El DTF rinde full color y degradés sin recargo por tono.",
+    garments: ["Polerón canguro"],
+    techniques: ["Transfer DTF"],
+    image: "/trabajos/klog-poleron-dtf.webp",
+    width: 1200,
+    height: 905,
+    productHandles: ["poleron-canguro"],
+  },
+  {
+    slug: "howdy-cuadernos",
+    client: "Howdy",
+    summary: "Cuadernos, libretas y lápices personalizados",
+    detail:
+      "Para Howdy: cuaderno con resorte «Howdy Olympics» ilustrado a todo color, libreta «Keeping my notes weird» y lápices con la marca. También hacemos merchandising más allá de la ropa.",
+    garments: ["Cuaderno con resorte", "Libreta", "Lápices"],
+    techniques: ["Estampado"],
+    image: "/trabajos/howdy-cuadernos.webp",
+    width: 1200,
+    height: 1311,
+    productHandles: [],
   },
 ] as const;
 
