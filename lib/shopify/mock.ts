@@ -684,7 +684,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Gorro alto de chef en Polycron, el complemento clásico del uniforme de cocina. Acepta un color o combinación bicolor.",
     material: "Polycron", tallas: "Única", plazo: "10 a 15 días", leadDays: 15, modalidad: "Fabricación a medida", baseCostUsd: 3,
     nota: "Un color o bicolor a elección",
-    colors: ["Blanco", "Negro"],
+    colors: ["Negro", "Blanco", "Rojo"],
     pricing: tramos({ 10: 5990, 25: 5500, 50: 4900, 100: 4500, 250: 3990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_CENTRO],
   }),
   product({
@@ -693,7 +693,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Cofia redonda con elástico, esencial en cocinas y faenas con normas de higiene. Disponible en un solo color o combinación bicolor.",
     material: "A confirmar al cotizar", tallas: "Única", plazo: "10 a 15 días confección / 3 a 6 días si hay stock", leadDays: 12, modalidad: "Fabricación a medida", baseCostUsd: 2,
     nota: "Un color o bicolor a elección",
-    colors: ["Blanco", "Negro"],
+    colors: ["Negro", "Blanco", "Rojo"],
     pricing: tramos({ 10: 4990, 25: 4500, 50: 3990, 100: 3500 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_CENTRO],
   }),
 
