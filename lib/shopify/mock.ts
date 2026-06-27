@@ -310,6 +310,12 @@ type ProductInput = {
    * apenas exista public/products/<handle>.webp.
    */
   imageHandle?: string;
+  /**
+   * `true` cuando la foto ya es del color real del producto (foto real, no la
+   * base crema para teñir). Desactiva el tinte por color: la imagen se muestra
+   * tal cual y los swatches solo registran el color elegido en la cotización.
+   */
+  untinted?: boolean;
   title: string;
   category: string;
   catTag: string;
@@ -373,6 +379,7 @@ function product(o: ProductInput): CorporateProduct {
     volumePricing,
     printAreas: o.areas,
     printTechniques: o.techniques,
+    tintable: o.untinted ? false : undefined,
     tags: ["CORPORATIVO", o.catTag, modalidadTag],
   };
 }
@@ -442,12 +449,12 @@ export const mockCorporateProducts: CorporateProduct[] = [
 
   // === Polerones y Polar ===================================================
   product({
-    key: "POLARML", handle: "polar-manga-larga",
+    key: "POLARML", handle: "polar-manga-larga", untinted: true,
     title: "Polar Manga Larga", category: "Polerones y Polar", catTag: "polerones",
     intro: "Polar micropolar antipilling 300 g con manga larga, pretina ajustable y puños elasticados. Abrigo liviano para faena, oficina y terreno.",
     material: "100% poliéster · micropolar antipilling 300 g · pretina ajustable y puños elasticados", tallas: "XS a 3XL", plazo: "3 a 7 días", leadDays: 7,
     modalidad: "Stock", nota: "Elige versión hombre o mujer", baseCostUsd: 12,
-    colors: ["Azul marino", "Negro", "Azulino", "Rojo", "Beige", "Verde botella", "Gris"],
+    colors: ["Gris", "Azul marino", "Negro", "Azulino", "Rojo", "Beige", "Verde botella"],
     pricing: tramos({ 10: 14500, 25: 13990, 50: 12990, 100: 12500, 250: 11990 }), techniques: [BORDADO], areas: [PECHO_IZQ, PECHO_CENTRO, MANGA],
   }),
   product({
@@ -485,7 +492,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
 
   // === Camisas y Blusas ====================================================
   product({
-    key: "OXFH", handle: "camisa-oxford",
+    key: "OXFH", handle: "camisa-oxford", untinted: true,
     title: "Camisa Oxford", category: "Camisas y Blusas", catTag: "camisas",
     intro: "Camisa Oxford clásica de uniforme ejecutivo. Acabado prolijo y elegante, ideal para bordar el logo al pecho.",
     material: "Tela Oxford", tallas: "S a 3XL", plazo: "A confirmar al cotizar", leadDays: 7, modalidad: "Stock", baseCostUsd: 9,
@@ -572,16 +579,16 @@ export const mockCorporateProducts: CorporateProduct[] = [
   // prenda técnica más parecida como stand-in temporal. Precios por RANGO
   // (rangePricing) hasta tener los tramos exactos por cantidad.
   product({
-    key: "PKSMM", handle: "parka-sin-manga-mujer", imageHandle: "softshell-sin-manga",
+    key: "PKSMM", handle: "parka-sin-manga-mujer", untinted: true,
     title: "Parka Sin Mangas Mujer", category: "Ropa Técnica y Cortavientos", catTag: "tecnica",
     intro: "Parka sin mangas de mujer en nylon, liviana y cortaviento para sumar abrigo al torso sin restar movilidad. Capa ideal sobre el uniforme.",
     material: "100% nylon", tallas: "S a 2XL", plazo: "5 a 7 días", leadDays: 7, modalidad: "Stock", baseCostUsd: 14,
     nota: "Disponible hombre y mujer",
-    colors: ["Azul marino", "Gris", "Negro", "Rojo"],
+    colors: ["Negro", "Azul marino", "Gris", "Rojo"],
     priceHigh: 25500, priceLow: 20500, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ, PECHO_CENTRO, ESPALDA_SOFTSHELL],
   }),
   product({
-    key: "PKSMH", handle: "parka-sin-manga-hombre", imageHandle: "softshell-sin-manga",
+    key: "PKSMH", handle: "parka-sin-manga-hombre", untinted: true,
     title: "Parka Sin Mangas Hombre", category: "Ropa Técnica y Cortavientos", catTag: "tecnica",
     intro: "Parka sin mangas de hombre en nylon, liviana y cortaviento. Abrigo para el torso que deja los brazos libres, lista para llevar tu logo.",
     material: "100% nylon", tallas: "S a 2XL", plazo: "5 a 7 días", leadDays: 7, modalidad: "Stock", baseCostUsd: 14,
@@ -597,7 +604,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     priceHigh: 24000, priceLow: 18000, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_SOFTSHELL,
   }),
   product({
-    key: "PK31H", handle: "parka-3-en-1-hombre", imageHandle: "softshell-hombre",
+    key: "PK31H", handle: "parka-3-en-1-hombre", untinted: true,
     title: "Parka 3 en 1 Hombre", category: "Ropa Técnica y Cortavientos", catTag: "tecnica",
     intro: "Parka 3 en 1 de hombre: capa exterior térmica e impermeable más un polar interior independiente que se usa solo o combinado. Tres prendas en una para cualquier clima.",
     material: "Parka térmica impermeable + polar interior independiente (cortaviento)", tallas: "S a 3XL", plazo: "5 a 7 días", leadDays: 7, modalidad: "Stock", baseCostUsd: 26,
@@ -605,13 +612,24 @@ export const mockCorporateProducts: CorporateProduct[] = [
     priceHigh: 50000, priceLow: 35000, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_SOFTSHELL,
   }),
   product({
-    key: "PK31M", handle: "parka-3-en-1-mujer", imageHandle: "softshell-mujer",
+    key: "PK31M", handle: "parka-3-en-1-mujer", untinted: true,
     title: "Parka 3 en 1 Mujer", category: "Ropa Técnica y Cortavientos", catTag: "tecnica",
     intro: "Parka 3 en 1 de mujer: capa exterior térmica e impermeable más un polar interior independiente, para usar por separado o juntos según el clima.",
     material: "Parka térmica impermeable + polar interior independiente", tallas: "S a 2XL", plazo: "5 a 7 días", leadDays: 7, modalidad: "Stock", baseCostUsd: 26,
     nota: "Disponible hombre y mujer",
     colors: ["Azul marino", "Rojo", "Gris", "Negro"],
     priceHigh: 50000, priceLow: 35000, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_SOFTSHELL,
+  }),
+  // Producto NUEVO (2026-06-27). Foto real (negra). PROVISORIO: precio, tallas y
+  // colores por confirmar con la marca; hoy solo se ve negra en la foto.
+  product({
+    key: "PKPLUMA", handle: "parka-tipo-pluma", untinted: true,
+    title: "Parka Tipo Pluma", category: "Ropa Técnica y Cortavientos", catTag: "tecnica",
+    intro: "Parka tipo pluma: chaqueta acolchada liviana tipo plumón, abrigada y compacta para el frío. Liviana de cargar y lista para llevar tu logo.",
+    material: "Exterior nylon, relleno tipo pluma", tallas: "S a 3XL", plazo: "5 a 7 días", leadDays: 7, modalidad: "Stock", baseCostUsd: 18,
+    nota: "Producto nuevo — precio, tallas y colores por confirmar.",
+    colors: ["Negro"],
+    priceHigh: 32000, priceLow: 26000, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_SOFTSHELL,
   }),
 
   // === Jockeys, Gorros y Accesorios ========================================
@@ -683,7 +701,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     pricing: tramos({ 10: 6990, 25: 5990, 50: 5500, 100: 4990, 250: 4500 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF, VINILO], areas: AREAS_DELANTAL,
   }),
   product({
-    key: "PECHJ", handle: "pechera-jeans",
+    key: "PECHJ", handle: "pechera-jeans", untinted: true,
     title: "Pechera Jeans", category: "Delantales y Uniformes", catTag: "uniformes",
     intro: "Pechera de mezclilla (jeans), resistente y con estilo para cafeterías, baristas y retail.",
     material: "Jeans (mezclilla)", tallas: "Única", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock", baseCostUsd: 5,
@@ -793,7 +811,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     pricing: tramos({ 10: 11990, 25: 11990, 50: 11990, 100: 10500, 250: 9500 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ],
   }),
   product({
-    key: "JEANS", handle: "pantalon-jeans",
+    key: "JEANS", handle: "pantalon-jeans", untinted: true,
     title: "Pantalón Jeans", category: "Pantalones", catTag: "pantalones",
     intro: "Pantalón de mezclilla azul clásica, resistente y versátil. Para staff que necesita aguante con onda casual.",
     material: "Mezclilla azul", tallas: "Cintura 38 a 60", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock", baseCostUsd: 7,

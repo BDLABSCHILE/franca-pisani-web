@@ -173,9 +173,13 @@ export function ProductConfigurator({
           area={selectedArea}
           logoUrl={logo?.previewUrl ?? null}
           onLogoSizeChange={handleLogoSizeChange}
-          tintColor={tintForColor(
-            selectedVariant?.selectedOptions.find((o) => o.name === "Color")?.value,
-          )}
+          tintColor={
+            product.tintable === false
+              ? null
+              : tintForColor(
+                  selectedVariant?.selectedOptions.find((o) => o.name === "Color")?.value,
+                )
+          }
         />
       </div>
 

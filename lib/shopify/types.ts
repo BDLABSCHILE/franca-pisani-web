@@ -134,6 +134,12 @@ export type CorporateProduct = {
   printAreas: PrintArea[];
   /** Técnicas disponibles para este producto. */
   printTechniques: PrintTechnique[];
+  /**
+   * Si la foto base ya es del color real del producto (no la base crema/blanca
+   * pensada para teñir), `false` desactiva el tinte multiply en card,
+   * configurador y preview. Default (undefined) = se tiñe según el color.
+   */
+  tintable?: boolean;
 
   tags: string[];
 };

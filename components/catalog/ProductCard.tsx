@@ -47,7 +47,8 @@ export function ProductCard({ product, stockTotal }: Props) {
   const repColor = product.variants[0]?.selectedOptions.find(
     (o) => o.name === "Color",
   )?.value;
-  const tintHex = tintForColor(repColor);
+  // tintable === false → la foto ya es del color real, no se tiñe.
+  const tintHex = product.tintable === false ? null : tintForColor(repColor);
 
   return (
     <Link
