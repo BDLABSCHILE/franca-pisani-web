@@ -500,7 +500,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     pricing: tramos({ 10: 13990, 25: 13500, 50: 12990, 100: 11500, 250: 10500 }), techniques: [BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
   }),
   product({
-    key: "OXFM", handle: "blusa-oxford",
+    key: "OXFM", handle: "blusa-oxford", untinted: true,
     title: "Blusa Oxford", category: "Camisas y Blusas", catTag: "camisas",
     intro: "Blusa Oxford de corte femenino, elegante y cómoda para uniforme corporativo. Calce prolijo para la oficina.",
     material: "Tela Oxford", tallas: "S a 2XL", plazo: "A confirmar al cotizar", leadDays: 7, modalidad: "Stock", baseCostUsd: 9,
@@ -516,7 +516,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     pricing: tramos({ 10: 14990, 25: 13990, 50: 13500, 100: 11990, 250: 10990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
   }),
   product({
-    key: "JEANSM", handle: "blusa-jeans",
+    key: "JEANSM", handle: "blusa-jeans", untinted: true,
     title: "Blusa Jeans", category: "Camisas y Blusas", catTag: "camisas",
     intro: "Blusa de mezclilla (jeans) de corte femenino. Estilo casual y resistente para equipos con personalidad.",
     material: "A confirmar al cotizar", tallas: "S a 2XL", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock", baseCostUsd: 9,
@@ -575,6 +575,17 @@ export const mockCorporateProducts: CorporateProduct[] = [
     colors: ["Azulino", "Azul marino", "Blanco", "Verde", "Rojo", "Negro"],
     pricing: tramos({ 10: 15990, 25: 15500, 50: 14990, 100: 14500 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF], areas: AREAS_SOFTSHELL,
   }),
+  // Producto NUEVO (2026-07-01). Foto real (azul marino). PROVISORIO: precio,
+  // tallas y colores por confirmar.
+  product({
+    key: "CVDEP", handle: "cortavientos-deportivo-gorro", untinted: true,
+    title: "Cortavientos Deportivo con Gorro", category: "Ropa Técnica y Cortavientos", catTag: "tecnica",
+    intro: "Cortavientos deportivo con gorro y cierre completo, liviano y repelente al viento. Bolsillos con cierre, pensado para actividad y equipos en movimiento.",
+    material: "Poliéster liviano", tallas: "S a 2XL", plazo: "5 a 7 días", leadDays: 7, modalidad: "Stock", baseCostUsd: 11,
+    nota: "Producto nuevo — precio, tallas y colores por confirmar.",
+    colors: ["Azul marino"],
+    priceHigh: 18990, priceLow: 15990, techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF], areas: AREAS_SOFTSHELL,
+  }),
   // Parkas (levantamiento 2026-06-26). FOTOS PENDIENTES: usan imageHandle de la
   // prenda técnica más parecida como stand-in temporal. Precios por RANGO
   // (rangePricing) hasta tener los tramos exactos por cantidad.
@@ -628,7 +639,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Parka tipo pluma: chaqueta acolchada liviana tipo plumón, abrigada y compacta para el frío. Liviana de cargar y lista para llevar tu logo.",
     material: "Exterior nylon, relleno tipo pluma", tallas: "S a 3XL", plazo: "5 a 7 días", leadDays: 7, modalidad: "Stock", baseCostUsd: 18,
     nota: "Producto nuevo — precio, tallas y colores por confirmar.",
-    colors: ["Negro"],
+    colors: ["Gris", "Negro"],
     priceHigh: 32000, priceLow: 26000, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_SOFTSHELL,
   }),
 
