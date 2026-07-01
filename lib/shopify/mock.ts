@@ -639,7 +639,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     intro: "Parka tipo pluma: chaqueta acolchada liviana tipo plumón, abrigada y compacta para el frío. Liviana de cargar y lista para llevar tu logo.",
     material: "Exterior nylon, relleno tipo pluma", tallas: "S a 3XL", plazo: "5 a 7 días", leadDays: 7, modalidad: "Stock", baseCostUsd: 18,
     nota: "Producto nuevo — precio, tallas y colores por confirmar.",
-    colors: ["Gris", "Negro"],
+    colors: ["Gris"],
     priceHigh: 32000, priceLow: 26000, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_SOFTSHELL,
   }),
 
