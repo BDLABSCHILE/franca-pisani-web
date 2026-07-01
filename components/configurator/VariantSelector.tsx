@@ -57,9 +57,15 @@ export function VariantSelector({ variants, selectedId, onChange }: Props) {
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
               {values.map((value) => {
+                // Al cambiar esta opción, preserva el valor de las DEMÁS
+                // opciones (ej. cambiar Corte no debe resetear el Color).
                 const candidate = variants.find((v) =>
-                  v.selectedOptions.some(
-                    (o) => o.name === optName && o.value === value,
+                  v.selectedOptions.every((o) =>
+                    o.name === optName
+                      ? o.value === value
+                      : o.value ===
+                        selected.selectedOptions.find((s) => s.name === o.name)
+                          ?.value,
                   ),
                 );
                 const isActive = value === selectedValue;

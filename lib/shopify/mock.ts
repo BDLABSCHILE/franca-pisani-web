@@ -255,19 +255,34 @@ function makeVariants(
   specs: VariantSpec[],
   handle: string,
   colorPhotos: boolean,
+  cortes: string[],
 ) {
-  return specs.map(({ color, sku }) => ({
-    id: `rpc_var_${productKey}_${sku.toLowerCase()}`,
-    title: color,
-    sku,
-    selectedOptions: [{ name: "Color", value: color }],
-    priceRetail: { amount: retailClp, currencyCode: "CLP" as const },
-    // Con colorPhotos, cada variante apunta a su foto de color propia; el
-    // ProductConfigurator ya muestra selectedVariant.image en las zonas
-    // frontales, así el selector cambia la prenda al color elegido.
-    image: localImage(colorPhotos ? colorImageHandle(handle, color) : handle, color),
-    availableForSale: true,
-  }));
+  // Con corte (Hombre/Mujer) las variantes son Color × Corte. El corte NO
+  // cambia la imagen (misma foto/tinte por color); solo queda registrado en la
+  // variante para la cotización. Sin cortes → una variante por color.
+  const corteList = cortes.length ? cortes : [null];
+  return specs.flatMap(({ color, sku }) =>
+    corteList.map((corte) => {
+      const suffix = corte ? `_${colorSlug(corte)}` : "";
+      return {
+        id: `rpc_var_${productKey}_${sku.toLowerCase()}${suffix}`,
+        title: corte ? `${color} · ${corte}` : color,
+        sku: corte ? `${sku}-${colorSlug(corte).toUpperCase()}` : sku,
+        selectedOptions: corte
+          ? [
+              { name: "Color", value: color },
+              { name: "Corte", value: corte },
+            ]
+          : [{ name: "Color", value: color }],
+        priceRetail: { amount: retailClp, currencyCode: "CLP" as const },
+        // Con colorPhotos, cada variante apunta a su foto de color propia; el
+        // ProductConfigurator ya muestra selectedVariant.image en las zonas
+        // frontales, así el selector cambia la prenda al color elegido.
+        image: localImage(colorPhotos ? colorImageHandle(handle, color) : handle, color),
+        availableForSale: true,
+      };
+    }),
+  );
 }
 
 function specsFromColors(prefix: string, colors: string[]): VariantSpec[] {
@@ -341,6 +356,8 @@ type ProductInput = {
    * selector cambia la imagen al color elegido. Implica untinted.
    */
   colorPhotos?: boolean;
+  /** Cortes disponibles (ej. ["Hombre", "Mujer"]) → 2ª opción de variante. */
+  cortes?: string[];
   title: string;
   category: string;
   catTag: string;
@@ -404,7 +421,7 @@ function product(o: ProductInput): CorporateProduct {
     }),
     featuredImage: localImage(heroImageHandle, o.title),
     images: [localImage(heroImageHandle, o.title)],
-    variants: makeVariants(o.key, retailClp, specsFromColors(o.key, o.colors), imageHandle, colorPhotos),
+    variants: makeVariants(o.key, retailClp, specsFromColors(o.key, o.colors), imageHandle, colorPhotos, o.cortes ?? []),
     minQty: minimo,
     leadTimeDaysReorder: o.leadDays,
     baseCostUsd: o.baseCostUsd ?? 6,
@@ -421,7 +438,7 @@ function product(o: ProductInput): CorporateProduct {
 export const mockCorporateProducts: CorporateProduct[] = [
   // === Poleras =============================================================
   product({
-    key: "PIQMC", handle: "polera-pique-cuello-botones-manga-corta",
+    key: "PIQMC", handle: "polera-pique-cuello-botones-manga-corta", cortes: ["Hombre", "Mujer"],
     title: "Polera Piqué Cuello y Botones M/C", category: "Poleras", catTag: "poleras",
     intro: "La clásica polera piqué de uniforme corporativo en manga corta. Cuello y puños tejidos y el lienzo perfecto para tu logo al pecho.",
     material: "80% algodón · 20% poliéster (piqué)", tallas: "S a 3XL", plazo: "5 a 7 días", leadDays: 7,
@@ -430,7 +447,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     pricing: tramos({ 10: 8500, 25: 7990, 50: 7500, 100: 6990, 250: 6500 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF, VINILO], areas: AREAS_PIQUE,
   }),
   product({
-    key: "PIQML", handle: "polera-pique-cuello-botones-manga-larga",
+    key: "PIQML", handle: "polera-pique-cuello-botones-manga-larga", cortes: ["Hombre", "Mujer"],
     title: "Polera Piqué Cuello y Botones M/L", category: "Poleras", catTag: "poleras",
     intro: "La polera piqué de uniforme en manga larga, para climas fríos o un look más formal. Cuello y puños tejidos, lista para tu marca.",
     material: "80% algodón · 20% poliéster (piqué)", tallas: "S a 3XL", plazo: "5 a 7 días", leadDays: 7,
@@ -439,7 +456,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     pricing: tramos({ 10: 8900, 25: 8500, 50: 7900, 100: 7500, 250: 6990 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF, VINILO], areas: AREAS_PIQUE,
   }),
   product({
-    key: "CRMC", handle: "polera-cuello-redondo-manga-corta",
+    key: "CRMC", handle: "polera-cuello-redondo-manga-corta", cortes: ["Hombre", "Mujer"],
     title: "Polera Cuello Redondo M/C", category: "Poleras", catTag: "poleras",
     intro: "Polera cuello redondo 100% algodón, la prenda más rendidora para eventos, activaciones y equipos — y la que más colores ofrece del catálogo.",
     material: "100% algodón", tallas: "XS a 3XL", plazo: "3 a 4 días", leadDays: 4, modalidad: "Stock",
@@ -447,7 +464,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     pricing: tramos({ 10: 5990, 25: 5500, 50: 4500, 100: 3990, 250: 3500 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF, VINILO], areas: AREAS_PRENDA,
   }),
   product({
-    key: "CRML", handle: "polera-cuello-redondo-manga-larga",
+    key: "CRML", handle: "polera-cuello-redondo-manga-larga", cortes: ["Hombre", "Mujer"],
     title: "Polera Cuello Redondo M/L", category: "Poleras", catTag: "poleras",
     intro: "Polera cuello redondo 100% algodón en manga larga: la misma versatilidad, con más abrigo para el día a día.",
     material: "100% algodón", tallas: "XS a 3XL", plazo: "3 a 5 días", leadDays: 5, modalidad: "Stock",
