@@ -567,12 +567,12 @@ export const mockCorporateProducts: CorporateProduct[] = [
     pricing: tramos({ 10: 21500, 25: 20500, 50: 19500, 100: 18900 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ, PECHO_CENTRO, ESPALDA_SOFTSHELL],
   }),
   product({
-    key: "CORTAV", handle: "cortavientos",
+    key: "CORTAV", handle: "cortavientos", untinted: true,
     title: "Cortavientos", category: "Ropa Técnica y Cortavientos", catTag: "tecnica",
     intro: "Cortavientos liviano en tela taslan, perfecto para activaciones, eventos al aire libre y equipos en movimiento.",
     material: "Taslan", tallas: "XS a 2XL", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock", baseCostUsd: 10,
     nota: "Elige hombre, mujer o unisex",
-    colors: ["Azul marino", "Azulino", "Blanco", "Verde", "Rojo", "Negro"],
+    colors: ["Azulino", "Azul marino", "Blanco", "Verde", "Rojo", "Negro"],
     pricing: tramos({ 10: 15990, 25: 15500, 50: 14990, 100: 14500 }), techniques: [BORDADO, SERIGRAFIA_1C, TRANSFER_DTF], areas: AREAS_SOFTSHELL,
   }),
   // Parkas (levantamiento 2026-06-26). FOTOS PENDIENTES: usan imageHandle de la
@@ -596,11 +596,11 @@ export const mockCorporateProducts: CorporateProduct[] = [
     priceHigh: 25500, priceLow: 20500, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_IZQ, PECHO_CENTRO, ESPALDA_SOFTSHELL],
   }),
   product({
-    key: "PKTREF", handle: "parka-termica-reflectante", imageHandle: "softshell-hombre",
+    key: "PKTREF", handle: "parka-termica-reflectante", untinted: true,
     title: "Parka Térmica con Reflectante", category: "Ropa Técnica y Cortavientos", catTag: "tecnica",
     intro: "Parka térmica en poliéster con cinta reflectante, pensada para terreno y trabajo en baja luz. Abriga y da visibilidad al equipo.",
     material: "100% poliéster", tallas: "S a 3XL", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock", baseCostUsd: 13,
-    colors: ["Azul", "Negro"],
+    colors: ["Azul marino", "Negro"],
     priceHigh: 24000, priceLow: 18000, techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_SOFTSHELL,
   }),
   product({
@@ -725,11 +725,11 @@ export const mockCorporateProducts: CorporateProduct[] = [
     pricing: tramos({ 10: 6990, 25: 6500, 50: 5990, 100: 5500, 250: 4990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_CENTRO],
   }),
   product({
-    key: "MANDG", handle: "mandil-corto-grueso",
+    key: "MANDG", handle: "mandil-corto-grueso", untinted: true,
     title: "Mandil Corto Grueso", category: "Delantales y Uniformes", catTag: "uniformes",
     intro: "Mandil corto en gabardina Polycron, más grueso y resistente para uso intensivo en cocina y servicio.",
     material: "Gabardina / Polycron", tallas: "Única", plazo: "3 a 5 días (10 a 15 si se confecciona)", leadDays: 5, modalidad: "Stock", baseCostUsd: 4,
-    colors: ["Negro", "Café", "Rojo"],
+    colors: ["Rojo", "Negro", "Café"],
     pricing: tramos({ 10: 7990, 25: 7500, 50: 6990, 100: 6500, 250: 5990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_CENTRO],
   }),
   product({
