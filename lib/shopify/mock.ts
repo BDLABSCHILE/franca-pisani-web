@@ -508,7 +508,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     pricing: tramos({ 10: 12990, 25: 11990, 50: 11500, 100: 10990, 250: 9990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: AREAS_CAMISA,
   }),
   product({
-    key: "JEANSH", handle: "camisa-jeans",
+    key: "JEANSH", handle: "camisa-jeans", untinted: true,
     title: "Camisa Jeans", category: "Camisas y Blusas", catTag: "camisas",
     intro: "Camisa de mezclilla (jeans) para un uniforme con onda casual. Resistente y versátil, va con todo.",
     material: "A confirmar al cotizar", tallas: "S a 2XL", plazo: "3 a 7 días", leadDays: 7, modalidad: "Stock", baseCostUsd: 9,
@@ -733,7 +733,7 @@ export const mockCorporateProducts: CorporateProduct[] = [
     pricing: tramos({ 10: 7990, 25: 7500, 50: 6990, 100: 6500, 250: 5990 }), techniques: [SERIGRAFIA_1C, BORDADO, TRANSFER_DTF], areas: [PECHO_CENTRO],
   }),
   product({
-    key: "MANDL", handle: "mandil-largo",
+    key: "MANDL", handle: "mandil-largo", untinted: true,
     title: "Mandil Largo", category: "Delantales y Uniformes", catTag: "uniformes",
     intro: "Mandil largo de poliéster o gabardina, cobertura completa para cocina y faena.",
     material: "Poliéster o gabardina", tallas: "Única", plazo: "3 a 5 días en stock / 10 días confección", leadDays: 10, modalidad: "Fabricación a medida", baseCostUsd: 4,
