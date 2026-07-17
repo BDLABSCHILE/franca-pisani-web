@@ -67,9 +67,15 @@ export function BrandFooter() {
             href="https://bdlabs.cl"
             target="_blank"
             rel="noreferrer noopener"
-            className="text-rpc-text/40 transition hover:text-rpc-text/70"
+            className="inline-flex items-center gap-1.5 text-rpc-text/40 transition hover:text-rpc-text/70"
           >
-            Hecho por BDLABS · bdlabs.cl
+            Hecho por
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/bdlabs-logo-onlight.png"
+              alt="BDLABS"
+              className="h-5 w-auto opacity-60 transition hover:opacity-90"
+            />
           </a>
         </div>
       </div>
