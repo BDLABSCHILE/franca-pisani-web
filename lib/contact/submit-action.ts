@@ -4,6 +4,7 @@ import { z } from "zod";
 import { Resend } from "resend";
 import { ContactInquiry } from "@/emails/ContactInquiry";
 import { CONTACT } from "@/lib/brand/contacts";
+import { checkHoneypotAndTiming, looksLikeGibberish } from "@/lib/anti-spam";
 
 /**
  * Server Action del formulario de contacto general.
@@ -50,6 +51,14 @@ export async function submitContactAction(
   _prevState: ContactSubmitResult | null,
   formData: FormData,
 ): Promise<ContactSubmitResult> {
+  // Anti-spam previo a la validación: honeypot + timing. Si es bot, devolvemos
+  // "éxito" silencioso — el bot cree que envió, pero no se manda ningún correo.
+  const signal = checkHoneypotAndTiming(formData);
+  if (signal.spam) {
+    console.warn(`[submitContactAction] descartado como spam (${signal.reason})`);
+    return { ok: true, dryRun: false };
+  }
+
   const raw = {
     name: formData.get("name"),
     email: formData.get("email"),
@@ -71,6 +80,15 @@ export async function submitContactAction(
   }
 
   const data = parsed.data;
+
+  // Red de seguridad para bots que igual pasan honeypot/timing: si TANTO el
+  // nombre como el mensaje son texto aleatorio, es spam. Exigir ambos evita
+  // descartar por error a un cliente que pegue un código o SKU raro.
+  if (looksLikeGibberish(data.name) && looksLikeGibberish(data.message)) {
+    console.warn(`[submitContactAction] descartado como spam (gibberish)`);
+    return { ok: true, dryRun: false };
+  }
+
   const submittedAt = new Date();
 
   if (!RESEND_API_KEY) {

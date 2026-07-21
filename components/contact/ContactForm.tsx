@@ -5,6 +5,7 @@ import {
   submitContactAction,
   type ContactSubmitResult,
 } from "@/lib/contact/submit-action";
+import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from "@/lib/anti-spam";
 import { cn } from "@/lib/utils/cn";
 
 /**
@@ -18,10 +19,21 @@ import { cn } from "@/lib/utils/cn";
  */
 export function ContactForm() {
   const formRef = useRef<HTMLFormElement>(null);
+  // Input oculto con el momento de carga del form. El server descarta envíos
+  // que llegan sospechosamente rápido (bots). Se fija en un effect (no en
+  // render) para no leer relojes durante el renderizado.
+  const tsInputRef = useRef<HTMLInputElement>(null);
   const [state, formAction, pending] = useActionState<
     ContactSubmitResult | null,
     FormData
   >(submitContactAction, null);
+
+  // Sella el timestamp de carga una sola vez, al montar.
+  useEffect(() => {
+    if (tsInputRef.current) {
+      tsInputRef.current.value = String(Date.now());
+    }
+  }, []);
 
   // Al recibir OK, limpiamos el form.
   useEffect(() => {
@@ -39,6 +51,36 @@ export function ContactForm() {
       action={formAction}
       className="grid gap-5 sm:grid-cols-2 sm:gap-x-8"
     >
+      {/* Honeypot: oculto para personas (y lectores de pantalla), visible para
+          bots que rellenan todo el DOM. Si llega con contenido, el server
+          descarta el envío. */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          left: "-9999px",
+          width: "1px",
+          height: "1px",
+          overflow: "hidden",
+        }}
+      >
+        <label>
+          No llenes este campo
+          <input
+            type="text"
+            name={HONEYPOT_FIELD}
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </label>
+      </div>
+      <input
+        type="hidden"
+        name={TIMESTAMP_FIELD}
+        ref={tsInputRef}
+        defaultValue=""
+      />
+
       <Field
         label="Tu nombre"
         name="name"
