@@ -7,6 +7,7 @@ import {
   type SubmitResult,
 } from "@/lib/quote/submit-action";
 import { clearCart, type CartLine } from "@/lib/quote/storage";
+import { HONEYPOT_FIELD, TIMESTAMP_FIELD } from "@/lib/anti-spam";
 import { cn } from "@/lib/utils/cn";
 
 /**
@@ -35,11 +36,21 @@ export function QuoteSubmitDrawer({
   lines: CartLine[];
 }) {
   const formRef = useRef<HTMLFormElement>(null);
+  // Input oculto con el momento en que se abrió el drawer. El server descarta
+  // envíos que llegan sospechosamente rápido (bots).
+  const tsInputRef = useRef<HTMLInputElement>(null);
 
   const [state, formAction, pending] = useActionState<
     SubmitResult | null,
     FormData
   >(submitQuoteAction, null);
+
+  // Sella el timestamp cada vez que se abre el drawer.
+  useEffect(() => {
+    if (open && tsInputRef.current) {
+      tsInputRef.current.value = String(Date.now());
+    }
+  }, [open]);
 
   // Lock body scroll mientras está abierto.
   useEffect(() => {
@@ -141,6 +152,35 @@ export function QuoteSubmitDrawer({
               type="hidden"
               name="linesJson"
               value={JSON.stringify(lines)}
+            />
+
+            {/* Anti-spam: honeypot oculto (bots lo llenan, personas no) + sello
+                de tiempo de apertura. */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                left: "-9999px",
+                width: "1px",
+                height: "1px",
+                overflow: "hidden",
+              }}
+            >
+              <label>
+                No llenes este campo
+                <input
+                  type="text"
+                  name={HONEYPOT_FIELD}
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+              </label>
+            </div>
+            <input
+              type="hidden"
+              name={TIMESTAMP_FIELD}
+              ref={tsInputRef}
+              defaultValue=""
             />
 
             <div className="flex-1 space-y-5 overflow-y-auto px-6 py-6">

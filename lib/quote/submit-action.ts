@@ -8,6 +8,7 @@ import { QuoteCreated } from "@/emails/QuoteCreated";
 import { QuoteToSales } from "@/emails/QuoteToSales";
 import { getCorporateProductByHandle } from "@/lib/shopify/storefront";
 import { isValidRut } from "@/lib/utils/rut";
+import { checkHoneypotAndTiming, looksLikeGibberish } from "@/lib/anti-spam";
 import { CONTACT } from "@/lib/brand/contacts";
 import type { CorporateProduct } from "@/lib/shopify/types";
 import type { CartLine } from "./storage";
@@ -254,6 +255,14 @@ export async function submitQuoteAction(
   _prevState: SubmitResult | null,
   formData: FormData,
 ): Promise<SubmitResult> {
+  // 0. Anti-spam: honeypot + timing antes de tocar nada. Si es bot, devolvemos
+  //    "éxito" silencioso con un número ficticio — no se genera PDF ni email.
+  const signal = checkHoneypotAndTiming(formData);
+  if (signal.spam) {
+    console.warn(`[submitQuoteAction] descartado como spam (${signal.reason})`);
+    return { ok: true, quoteNumber: generateQuoteNumber(), dryRun: false };
+  }
+
   // 1. Parsear payload.
   let raw: Record<string, unknown>;
   try {
@@ -298,6 +307,17 @@ export async function submitQuoteAction(
   }
 
   const data = parsed.data;
+
+  // 2b. Red de seguridad anti-spam: si TANTO la razón social como el nombre de
+  //     contacto son texto aleatorio, es bot. Exigir ambos evita descartar un
+  //     lead real (ya filtrado además por el RUT válido y el carrito no vacío).
+  if (
+    looksLikeGibberish(data.companyName) &&
+    looksLikeGibberish(data.contactName)
+  ) {
+    console.warn(`[submitQuoteAction] descartado como spam (gibberish)`);
+    return { ok: true, quoteNumber: generateQuoteNumber(), dryRun: false };
+  }
 
   // 3. Recalcular pricing server-side (anti-tampering). De aquí en adelante
   //    PDF, emails y totales usan SOLO estas líneas recalculadas.
