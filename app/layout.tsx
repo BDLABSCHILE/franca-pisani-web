@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Archivo, Inter } from "next/font/google";
 import { BrandHeader } from "@/components/brand/BrandHeader";
 import { BrandFooter } from "@/components/brand/BrandFooter";
@@ -17,6 +18,9 @@ const bodyFont = Inter({
   subsets: ["latin"],
   display: "swap",
 });
+
+// Google Tag Manager. ID overrideable por env sin tocar código.
+const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID ?? "GTM-T64WP5S";
 
 export const metadata: Metadata = {
   title: {
@@ -67,6 +71,23 @@ export default function RootLayout({
       className={`${archivo.variable} ${bodyFont.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-rpc-bg text-rpc-text">
+        {/* Google Tag Manager — carga el contenedor GTM. */}
+        <Script id="gtm-base" strategy="afterInteractive">
+          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','${GTM_ID}');`}
+        </Script>
+        {/* Google Tag Manager (noscript) — debe ir apenas abierto el <body>. */}
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
         <BrandHeader />
         <main className="flex-1">{children}</main>
         <BrandFooter />
