@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
+import { medir } from "@/lib/medicion";
 import Link from "next/link";
 import {
   submitQuoteAction,
@@ -67,6 +68,11 @@ export function QuoteSubmitDrawer({
   // detecta cart vacío y re-renderiza al estado "cotización vacía", botando
   // el drawer antes de que el usuario alcance a leer la confirmación.
   const submitted = state?.ok ?? false;
+  // Una conversión por cotización: el número la deduplica en Google y Meta.
+  const numeroCotizacion = state?.ok ? state.quoteNumber : null;
+  useEffect(() => {
+    if (numeroCotizacion) medir("cotizacion_enviada", { id: numeroCotizacion, origen: "cotizador" });
+  }, [numeroCotizacion]);
   const handleClose = () => {
     if (submitted) {
       clearCart();

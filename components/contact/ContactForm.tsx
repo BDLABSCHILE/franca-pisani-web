@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useRef, useEffect } from "react";
+import { medir } from "@/lib/medicion";
 import {
   submitContactAction,
   type ContactSubmitResult,
@@ -38,6 +39,7 @@ export function ContactForm() {
   // Al recibir OK, limpiamos el form.
   useEffect(() => {
     if (state?.ok) {
+      medir("contacto_enviado", { origen: "contacto" });
       formRef.current?.reset();
     }
   }, [state]);

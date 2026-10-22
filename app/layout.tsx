@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Medicion } from "@/components/medicion/Medicion";
 import Script from "next/script";
 import { Archivo, Inter } from "next/font/google";
 import { BrandHeader } from "@/components/brand/BrandHeader";
@@ -92,6 +93,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <main className="flex-1">{children}</main>
         <BrandFooter />
         <WhatsAppFloat />
+        <Medicion />
       </body>
     </html>
   );
