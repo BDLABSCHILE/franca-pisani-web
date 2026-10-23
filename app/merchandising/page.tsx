@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import type { ReactNode } from "react";
 import { CONTACT, CONTACT_LINKS } from "@/lib/brand/contacts";
 
 export const metadata: Metadata = {
   title: "Merchandising personalizado",
   description:
-    "Además de ropa, hacemos merchandising con tu logo: botellas, tazones, lápices, libretas, bolsas, lanyards y más. Cotiza directo por WhatsApp o correo.",
+    "Además de ropa, hacemos merchandising con tu logo: botellas, tazones, vasos térmicos, lápices, libretas, bolsas, lanyards, chapitas y más. Cotiza directo por WhatsApp o correo.",
 };
 
 /**
@@ -18,18 +17,50 @@ export const metadata: Metadata = {
  * consultas quedan en Google Ads y Meta igual que las del resto del sitio.
  *
  * Sin precios, plazos ni técnicas por producto: la marca no los entregó y no
- * se inventan. La foto es un trabajo real (Howdy, lib/works/works.ts).
+ * se inventan. TODAS las fotos son trabajos reales que mandó Macarena el
+ * 23-10-2026 (public/merch/, sin metadatos del teléfono). Gorros y bandanas
+ * no van acá: ya están en el catálogo de ropa.
  */
 
-type ProductoMerch = { nombre: string; plural: string; femenino?: boolean; texto: string; icono: ReactNode };
+type Foto = { src: string; alt: string; ancho: number; alto: number };
+type ProductoMerch = { nombre: string; plural: string; femenino?: boolean; texto: string; foto: Foto };
 
 const PRODUCTOS: ProductoMerch[] = [
-  { nombre: "Botellas", plural: "botellas", femenino: true, texto: "Botellas con tu logo para equipos, eventos y regalos corporativos.", icono: <IconBotella /> },
-  { nombre: "Tazones", plural: "tazones", texto: "Tazones con tu marca para la oficina, bienvenidas o fin de año.", icono: <IconTazon /> },
-  { nombre: "Lápices", plural: "lápices", texto: "Lápices con tu logo para ferias, reuniones y kits de bienvenida.", icono: <IconLapiz /> },
-  { nombre: "Libretas y cuadernos", plural: "libretas o cuadernos", texto: "Libretas y cuadernos con tu diseño, de tapa a tapa.", icono: <IconLibreta /> },
-  { nombre: "Bolsas", plural: "bolsas", femenino: true, texto: "Bolsas con tu logo para eventos, tiendas o kits de regalo.", icono: <IconBolsa /> },
-  { nombre: "Lanyards", plural: "lanyards", texto: "Lanyards con tu marca para credenciales de equipo y eventos.", icono: <IconLanyard /> },
+  { nombre: "Botellas", plural: "botellas", femenino: true, texto: "Botellas con tu logo para equipos, eventos y regalos corporativos.",
+    foto: { src: "/merch/botellas-ef.webp", alt: "Botellas negras personalizadas para EF", ancho: 1200, alto: 868 } },
+  { nombre: "Tazones", plural: "tazones", texto: "Tazones con tu marca para la oficina, bienvenidas o fin de año.",
+    foto: { src: "/merch/tazones-kreston.webp", alt: "Tazones blancos personalizados para Kreston ATC Chile", ancho: 1065, alto: 1200 } },
+  { nombre: "Vasos y mugs térmicos", plural: "vasos o mugs térmicos", texto: "Vasos y mugs térmicos con tu logo, en varios colores.",
+    foto: { src: "/merch/vasos-termicos.webp", alt: "Vasos térmicos azul, rojo y verde con logo grabado", ancho: 957, alto: 1200 } },
+  { nombre: "Lápices", plural: "lápices", texto: "Lápices con tu logo para ferias, reuniones y kits de bienvenida.",
+    foto: { src: "/merch/kit-fracttal.webp", alt: "Kit Fracttal con lápices, tazones, mug térmico y pendrive personalizados", ancho: 1200, alto: 1055 } },
+  { nombre: "Libretas y cuadernos", plural: "libretas o cuadernos", texto: "Libretas y cuadernos con tu diseño, de tapa a tapa.",
+    foto: { src: "/merch/libretas-lapices-newenkelen.webp", alt: "Libretas negras y lápices personalizados para Newenkelen", ancho: 894, alto: 1200 } },
+  { nombre: "Bolsas", plural: "bolsas", femenino: true, texto: "Bolsas y morrales con tu logo para eventos, tiendas o kits de regalo.",
+    foto: { src: "/merch/bolsas-ilustradas.webp", alt: "Bolsas de tela con ilustraciones personalizadas", ancho: 924, alto: 1200 } },
+  { nombre: "Lanyards", plural: "lanyards", texto: "Lanyards con tu marca para credenciales de equipo y eventos.",
+    foto: { src: "/merch/lanyards-recotec.webp", alt: "Lanyards azules personalizados para Recotec", ancho: 823, alto: 1200 } },
+  { nombre: "Chapitas", plural: "chapitas", femenino: true, texto: "Chapitas con tu logo para campañas, eventos y regalos.",
+    foto: { src: "/merch/chapitas-fundacion-los-leones.webp", alt: "Chapitas personalizadas para Fundación Los Leones", ancho: 1181, alto: 1200 } },
+];
+
+/** El resto de los trabajos reales, para la galería del final. */
+const GALERIA: Foto[] = [
+  { src: "/merch/kit-todo-terreno.webp", alt: "Bolsa, botella y jockey personalizados para Todo Terreno", ancho: 1194, alto: 1200 },
+  { src: "/merch/libretas-howdy.webp", alt: "Cuadernos, libreta y lápices personalizados para Howdy", ancho: 1122, alto: 1200 },
+  { src: "/merch/botellas-old-boys.webp", alt: "Botellas de aluminio grabadas para Old Boys", ancho: 1033, alto: 1200 },
+  { src: "/merch/tazones-dr-reddys.webp", alt: "Tazones personalizados con nombres para Dr. Reddy's", ancho: 1200, alto: 878 },
+  { src: "/merch/bolsas-atacama-kozan.webp", alt: "Bolsas personalizadas para Atacama Kozan", ancho: 1107, alto: 1200 },
+  { src: "/merch/lanyards-comery.webp", alt: "Lanyard negro personalizado para Comery", ancho: 719, alto: 1200 },
+  { src: "/merch/bolsas-lapices-mussa.webp", alt: "Bolsas y lápices personalizados para Mussa Vending", ancho: 1052, alto: 1200 },
+  { src: "/merch/morrales-natura.webp", alt: "Morrales de tela personalizados para Natura", ancho: 1089, alto: 1200 },
+  { src: "/merch/bolsa-gorro-plan-explora.webp", alt: "Bolsa y jockey personalizados para Plan Explora", ancho: 1040, alto: 1200 },
+  { src: "/merch/bolsa-dr-reddys.webp", alt: "Bolsa personalizada para Dr. Reddy's", ancho: 1057, alto: 1200 },
+  { src: "/merch/bolsitas-natura-ekos.webp", alt: "Bolsitas de tela personalizadas para Natura Ekos", ancho: 963, alto: 1200 },
+  { src: "/merch/bolsa-bordachar-meneses.webp", alt: "Bolsa de tela personalizada para Bordachar & Meneses", ancho: 1200, alto: 910 },
+  { src: "/merch/morral-natura.webp", alt: "Morral azul personalizado para Natura", ancho: 1014, alto: 1200 },
+  { src: "/merch/morral-cicletada.webp", alt: "Morral personalizado para una cicletada familiar", ancho: 909, alto: 1200 },
+  { src: "/merch/bolsa-bulldog.webp", alt: "Bolsa de tela con ilustración personalizada", ancho: 931, alto: 1200 },
 ];
 
 const personalizados = (femenino?: boolean) => (femenino ? "personalizadas" : "personalizados");
@@ -56,7 +87,7 @@ export default function MerchandisingPage() {
             Además de ropa, hacemos merchandising con tu logo.
           </h1>
           <p className="mt-6 max-w-2xl font-rpc-body text-base normal-case tracking-normal text-rpc-text/75 sm:text-lg">
-            Botellas, tazones, lápices, libretas, bolsas, lanyards y más, todo personalizado. Estos productos no
+            Botellas, tazones, vasos térmicos, lápices, libretas, bolsas, lanyards, chapitas y más, todo personalizado. Estos productos no
             están en el cotizador en línea: escríbenos y te cotizamos directo, según cantidad y diseño.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -84,11 +115,17 @@ export default function MerchandisingPage() {
           <h2 className="max-w-2xl text-2xl tracking-tight sm:text-3xl">¿Qué quieres personalizar?</h2>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {PRODUCTOS.map((p) => (
-              <article key={p.nombre} className="flex flex-col rounded-rpc-card border border-rpc-border bg-rpc-bg p-6">
-                <span className="inline-flex h-12 w-12 items-center justify-center rounded-rpc-button bg-rpc-info/10 text-rpc-info-dark">
-                  {p.icono}
-                </span>
-                <h3 className="mt-4 font-rpc-heading text-lg font-bold tracking-tight">{p.nombre}</h3>
+              <article key={p.nombre} className="flex flex-col overflow-hidden rounded-rpc-card border border-rpc-border bg-rpc-bg">
+                <Image
+                  src={p.foto.src}
+                  alt={p.foto.alt}
+                  width={p.foto.ancho}
+                  height={p.foto.alto}
+                  sizes="(min-width: 1024px) 30vw, (min-width: 640px) 50vw, 100vw"
+                  className="aspect-[4/3] w-full object-cover"
+                />
+                <div className="flex flex-1 flex-col p-6">
+                <h3 className="font-rpc-heading text-lg font-bold tracking-tight">{p.nombre}</h3>
                 <p className="mt-2 flex-1 text-sm leading-relaxed text-rpc-text/70">{p.texto}</p>
                 <div className="mt-6 grid grid-cols-2 gap-2">
                   <a
@@ -108,6 +145,7 @@ export default function MerchandisingPage() {
                   >
                     Correo
                   </a>
+                </div>
                 </div>
               </article>
             ))}
@@ -132,53 +170,26 @@ export default function MerchandisingPage() {
       </section>
 
       <section className="border-b border-rpc-border bg-rpc-bg">
-        <div className="mx-auto grid max-w-7xl items-center gap-10 px-6 py-16 lg:grid-cols-2 lg:px-10 lg:py-20">
-          <Image
-            src="/trabajos/howdy-cuadernos.webp"
-            alt="Cuaderno, libreta y lápices personalizados para Howdy"
-            width={1200}
-            height={1311}
-            sizes="(min-width: 1024px) 40vw, 100vw"
-            className="h-auto w-full max-w-md rounded-rpc-card border border-rpc-border"
-          />
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-rpc-info-dark">Trabajo real</p>
-            <h2 className="mt-3 text-2xl tracking-tight sm:text-3xl">Cuadernos, libretas y lápices para Howdy.</h2>
-            <p className="mt-4 text-sm leading-relaxed text-rpc-text/70 sm:text-base">
-              Cuaderno con resorte ilustrado a todo color, libreta y lápices con la marca. El mismo cuidado que
-              ponemos en la ropa, en todo lo que lleva tu logo.
-            </p>
+        <div className="mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-20">
+          <p className="text-xs font-semibold uppercase tracking-wide text-rpc-info-dark">Trabajos reales</p>
+          <h2 className="mt-3 max-w-2xl text-2xl tracking-tight sm:text-3xl">Merchandising que ya hicimos para nuestros clientes.</h2>
+          <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            {GALERIA.map((f) => (
+              <Image
+                key={f.src}
+                src={f.src}
+                alt={f.alt}
+                width={f.ancho}
+                height={f.alto}
+                sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
+                className="aspect-square w-full rounded-rpc-card border border-rpc-border object-cover"
+              />
+            ))}
           </div>
         </div>
       </section>
     </>
   );
-}
-
-function Icono({ children }: { children: ReactNode }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6" aria-hidden>
-      {children}
-    </svg>
-  );
-}
-function IconBotella() {
-  return <Icono><path d="M10 2h4v3l1.5 2.5V20a2 2 0 0 1-2 2h-3a2 2 0 0 1-2-2V7.5L10 5z" /><path d="M8.5 11h7" /></Icono>;
-}
-function IconTazon() {
-  return <Icono><path d="M4 8h12v7a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z" /><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16" /><path d="M8 3v2M12 3v2" /></Icono>;
-}
-function IconLapiz() {
-  return <Icono><path d="M4 20l1.2-4.2L16 5l3 3L8.2 18.8z" /><path d="M14 7l3 3" /></Icono>;
-}
-function IconLibreta() {
-  return <Icono><rect x="6" y="3" width="13" height="18" rx="1.5" /><path d="M4 7h3M4 12h3M4 17h3M10 8h6" /></Icono>;
-}
-function IconBolsa() {
-  return <Icono><path d="M5 8h14l-1 13H6z" /><path d="M9 8V6a3 3 0 0 1 6 0v2" /></Icono>;
-}
-function IconLanyard() {
-  return <Icono><path d="M7 2l5 9 5-9" /><rect x="8" y="11" width="8" height="10" rx="1.5" /><path d="M10 15h4" /></Icono>;
 }
 
 function WhatsAppIcon({ className }: { className?: string }) {

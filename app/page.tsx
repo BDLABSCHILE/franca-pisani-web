@@ -29,7 +29,7 @@ export default function Home() {
  * además de ropa hacen botellas, tazones, lápices, etc. No pasan por el
  * cotizador: la franja lleva a /merchandising, que cotiza por WhatsApp o correo.
  */
-const MERCH = ["Botellas", "Tazones", "Lápices", "Libretas", "Bolsas", "Lanyards"] as const;
+const MERCH = ["Botellas", "Tazones", "Vasos térmicos", "Lápices", "Libretas", "Bolsas", "Lanyards", "Chapitas"] as const;
 
 function MerchTeaser() {
   return (
