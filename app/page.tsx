@@ -14,12 +14,48 @@ export default function Home() {
       <Hero />
       <Pillars />
       <HowItWorks />
+      <MerchTeaser />
       <WorksTeaser />
       <LogoWall />
       <SuccessMetrics />
       <FaqB2B />
       <CtaFooter />
     </>
+  );
+}
+
+/**
+ * Franja de merchandising (pedido de Macarena, 23-10-2026): que se sepa que
+ * además de ropa hacen botellas, tazones, lápices, etc. No pasan por el
+ * cotizador: la franja lleva a /merchandising, que cotiza por WhatsApp o correo.
+ */
+const MERCH = ["Botellas", "Tazones", "Lápices", "Libretas", "Bolsas", "Lanyards"] as const;
+
+function MerchTeaser() {
+  return (
+    <section className="border-b border-rpc-border bg-rpc-bg">
+      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6 py-14 lg:flex-row lg:items-center lg:justify-between lg:px-10">
+        <div className="max-w-xl">
+          <p className="text-xs font-semibold uppercase tracking-wide text-rpc-info-dark">También hacemos merchandising</p>
+          <h2 className="mt-3 text-2xl tracking-tight sm:text-3xl">Tu logo, más allá de la ropa.</h2>
+          <ul className="mt-5 flex flex-wrap gap-2">
+            {MERCH.map((m) => (
+              <li key={m} className="rounded-full border border-rpc-border bg-rpc-surface px-3 py-1 text-sm text-rpc-text/80">
+                {m}
+              </li>
+            ))}
+            <li className="rounded-full border border-rpc-border bg-rpc-surface px-3 py-1 text-sm text-rpc-text/80">y más</li>
+          </ul>
+        </div>
+        <Link
+          href="/merchandising"
+          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-rpc-button bg-rpc-button px-7 py-4 text-xs uppercase tracking-[0.2em] text-rpc-button-text transition hover:opacity-90"
+        >
+          Ver merchandising
+          <span aria-hidden>→</span>
+        </Link>
+      </div>
+    </section>
   );
 }
 

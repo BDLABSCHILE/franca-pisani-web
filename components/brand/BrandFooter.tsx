@@ -23,6 +23,7 @@ export function BrandFooter() {
           </h3>
           <ul className="mt-4 space-y-2 text-sm text-rpc-text/70">
             <li><Link href="/catalogo" className="transition hover:text-rpc-text">Catálogo</Link></li>
+            <li><Link href="/merchandising" className="transition hover:text-rpc-text">Merchandising</Link></li>
             <li><Link href="/como-funciona" className="transition hover:text-rpc-text">Cómo funciona</Link></li>
             <li><Link href={"/casos-de-exito" as never} className="transition hover:text-rpc-text">Clientes</Link></li>
             <li><Link href="/cotizador" className="transition hover:text-rpc-text">Cotizador</Link></li>
