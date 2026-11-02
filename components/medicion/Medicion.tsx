@@ -3,6 +3,7 @@
 import Script from "next/script";
 import { useEffect } from "react";
 import { GOOGLE_ADS_ID, META_PIXEL_ID, medir } from "@/lib/medicion";
+import { guardarOrigenDeLaVisita } from "@/lib/origen-visita";
 
 /**
  * Carga las etiquetas de Google Ads y Meta (solo si tienen ID) y mide los clics
@@ -10,6 +11,9 @@ import { GOOGLE_ADS_ID, META_PIXEL_ID, medir } from "@/lib/medicion";
  * nuevo queda sin medir por olvidarse de llamar a `medir`.
  */
 export function Medicion() {
+  // El clic del anuncio que trajo la visita queda para la cotización (lib/origen-visita.ts).
+  useEffect(() => { guardarOrigenDeLaVisita(); }, []);
+
   useEffect(() => {
     const alClic = (e: MouseEvent) => {
       const a = (e.target as Element | null)?.closest?.("a[href]");

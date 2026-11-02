@@ -10,6 +10,7 @@ import { getCorporateProductByHandle } from "@/lib/shopify/storefront";
 import { isValidRut } from "@/lib/utils/rut";
 import { checkHoneypotAndTiming, looksLikeGibberish } from "@/lib/anti-spam";
 import { CONTACT } from "@/lib/brand/contacts";
+import { registrarSolicitudEnOs } from "@/lib/crm-os";
 import type { CorporateProduct } from "@/lib/shopify/types";
 import type { CartLine } from "./storage";
 
@@ -356,6 +357,18 @@ export async function submitQuoteAction(
         ".",
     };
   }
+
+  // 4b. Al CRM de la plataforma como Lead, con el anuncio que trajo la visita.
+  //     Nunca bota la cotización: si falla, queda en el log.
+  await registrarSolicitudEnOs({
+    tipo: "Solicitud web",
+    numero: quoteNumber,
+    empresa: data.companyName,
+    rut: data.rut,
+    contacto: { nombre: data.contactName, correo: data.contactEmail, telefono: data.contactPhone },
+    montoNeto: lines.reduce((suma, l) => suma + l.pricing.subtotalNet, 0),
+    detalle: lines.map((l) => `${l.quantity} × ${l.productTitle} (${l.techniqueLabel})`).join(" · "),
+  });
 
   // 5. Enviar emails (o dry-run si no hay credenciales).
   const pdfFilename = `Cotizacion-${quoteNumber}-RopaPublicitariaChile.pdf`;

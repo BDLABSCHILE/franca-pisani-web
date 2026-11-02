@@ -4,6 +4,7 @@ import { z } from "zod";
 import { Resend } from "resend";
 import { ContactInquiry } from "@/emails/ContactInquiry";
 import { CONTACT } from "@/lib/brand/contacts";
+import { registrarSolicitudEnOs } from "@/lib/crm-os";
 import { checkHoneypotAndTiming, looksLikeGibberish } from "@/lib/anti-spam";
 
 /**
@@ -90,6 +91,16 @@ export async function submitContactAction(
   }
 
   const submittedAt = new Date();
+
+  // Al CRM de la plataforma como Lead (sin RUT: el formulario no lo pide).
+  const sufijo = Math.random().toString(36).slice(2, 6).toUpperCase();
+  await registrarSolicitudEnOs({
+    tipo: "Contacto web",
+    numero: `C-${submittedAt.toISOString().slice(0, 10).replaceAll("-", "")}-${sufijo}`,
+    empresa: data.company ?? data.name,
+    contacto: { nombre: data.name, correo: data.email, telefono: data.phone },
+    detalle: data.message,
+  });
 
   if (!RESEND_API_KEY) {
     console.warn(
