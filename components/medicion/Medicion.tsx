@@ -3,7 +3,7 @@
 import Script from "next/script";
 import { useEffect } from "react";
 import { GOOGLE_ADS_ID, META_PIXEL_ID, medir } from "@/lib/medicion";
-import { guardarOrigenDeLaVisita } from "@/lib/origen-visita";
+import { guardarOrigenDeLaVisita, linkWhatsAppConReferencia, origenGuardado } from "@/lib/origen-visita";
 
 /**
  * Carga las etiquetas de Google Ads y Meta (solo si tienen ID) y mide los clics
@@ -19,7 +19,11 @@ export function Medicion() {
       const a = (e.target as Element | null)?.closest?.("a[href]");
       const href = a?.getAttribute("href") ?? "";
       const origen = location.pathname;
-      if (/^https?:\/\/(wa\.me|api\.whatsapp\.com)\//i.test(href)) medir("clic_whatsapp", { origen });
+      if (/^https?:\/\/(wa\.me|api\.whatsapp\.com)\//i.test(href)) {
+        // El mensaje lleva escrito de dónde llegó la visita (WhatsApp no deja pasar UTM).
+        a?.setAttribute("href", linkWhatsAppConReferencia(href, origenGuardado()));
+        medir("clic_whatsapp", { origen });
+      }
       else if (href.startsWith("mailto:")) medir("clic_correo", { origen });
     };
     document.addEventListener("click", alClic, { capture: true });

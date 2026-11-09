@@ -61,6 +61,38 @@ export function leerOrigen(crudo: string | undefined): OrigenVisita | null {
   } catch { return null; }
 }
 
+/**
+ * Referencia que viaja escrita en el mensaje de WhatsApp (pedido de Benja,
+ * 09-11-2026). WhatsApp no deja pasar UTM, así que el origen va en el texto:
+ * Maca lo ve en el primer mensaje y marca el canal correcto en el cotizador
+ * («¿Cómo llegó?»). Solo dice lo que trae la URL de llegada; nunca adivina.
+ */
+export function referenciaWhatsApp(o: OrigenVisita | null): string {
+  const canal = canalDeOrigen(o);
+  if (canal === "Web / formulario") return "(Ref. web)";
+  const campana = (o?.utmCampaign ?? "").replace(/[^\p{L}\p{N} _.|-]/gu, "").slice(0, 40).trim();
+  return `(Ref. web · ${canal}${campana ? ` · ${campana}` : ""})`;
+}
+
+/** Agrega la referencia al texto del link de WhatsApp (o lo crea si el link no traía mensaje). */
+export function linkWhatsAppConReferencia(href: string, o: OrigenVisita | null): string {
+  try {
+    const url = new URL(href);
+    const texto = url.searchParams.get("text") ?? "Hola, quiero cotizar.";
+    if (/\(Ref\. web/.test(texto)) return href;
+    url.searchParams.set("text", `${texto}\n\n${referenciaWhatsApp(o)}`);
+    return url.toString();
+  } catch { return href; }
+}
+
+/** Navegador: lee la cookie del clic guardado (o `null`). */
+export function origenGuardado(): OrigenVisita | null {
+  try {
+    const par = document.cookie.split("; ").find((c) => c.startsWith(`${COOKIE_ORIGEN}=`));
+    return leerOrigen(par?.slice(COOKIE_ORIGEN.length + 1));
+  } catch { return null; }
+}
+
 /** El canal del CRM (mismos nombres que el cotizador de Maca). Nunca adivina más allá de lo que dice la URL. */
 export function canalDeOrigen(o: OrigenVisita | null): string {
   if (!o) return "Web / formulario";
