@@ -3,7 +3,7 @@
 import Script from "next/script";
 import { useEffect } from "react";
 import { GOOGLE_ADS_ID, META_PIXEL_ID, medir } from "@/lib/medicion";
-import { guardarOrigenDeLaVisita, linkWhatsAppConReferencia, origenGuardado } from "@/lib/origen-visita";
+import { guardarOrigenDeLaVisita, linkWhatsAppConReferencia, nuevoCodigoWhatsApp, origenGuardado } from "@/lib/origen-visita";
 
 /**
  * Carga las etiquetas de Google Ads y Meta (solo si tienen ID) y mide los clics
@@ -21,7 +21,12 @@ export function Medicion() {
       const origen = location.pathname;
       if (/^https?:\/\/(wa\.me|api\.whatsapp\.com)\//i.test(href)) {
         // El mensaje lleva escrito de dónde llegó la visita (WhatsApp no deja pasar UTM).
-        a?.setAttribute("href", linkWhatsAppConReferencia(href, origenGuardado()));
+        // Un código por clic, registrado en el CRM con el clic del anuncio (cookie).
+        const codigo = /\(Ref\. web/.test(decodeURIComponent(href)) ? undefined : nuevoCodigoWhatsApp();
+        a?.setAttribute("href", linkWhatsAppConReferencia(href, origenGuardado(), codigo));
+        if (codigo) {
+          try { navigator.sendBeacon("/api/whatsapp-ref", new Blob([JSON.stringify({ ref: codigo })], { type: "application/json" })); } catch { /* medir nunca bota el clic */ }
+        }
         medir("clic_whatsapp", { origen });
       }
       else if (href.startsWith("mailto:")) medir("clic_correo", { origen });

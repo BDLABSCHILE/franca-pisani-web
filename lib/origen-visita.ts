@@ -67,20 +67,33 @@ export function leerOrigen(crudo: string | undefined): OrigenVisita | null {
  * Maca lo ve en el primer mensaje y marca el canal correcto en el cotizador
  * («¿Cómo llegó?»). Solo dice lo que trae la URL de llegada; nunca adivina.
  */
-export function referenciaWhatsApp(o: OrigenVisita | null): string {
+export function referenciaWhatsApp(o: OrigenVisita | null, codigo?: string): string {
   const canal = canalDeOrigen(o);
-  if (canal === "Web / formulario") return "(Ref. web)";
+  const cod = codigo ? ` ${codigo}` : "";
+  if (canal === "Web / formulario") return `(Ref. web${cod})`;
   const campana = (o?.utmCampaign ?? "").replace(/[^\p{L}\p{N} _.|-]/gu, "").slice(0, 40).trim();
-  return `(Ref. web · ${canal}${campana ? ` · ${campana}` : ""})`;
+  return `(Ref. web${cod} · ${canal}${campana ? ` · ${campana}` : ""})`;
+}
+
+/**
+ * Código corto por clic al WhatsApp (18-11-2026): viaja escrito en el mensaje
+ * y se registra en el CRM amarrado al clic del anuncio. Maca lo copia en su
+ * cotizador y la venta queda atribuida a la campaña que trajo la visita.
+ * Sin 0/O/1/I para que no se confundan al copiarlo.
+ */
+export function nuevoCodigoWhatsApp(): string {
+  const letras = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const bytes = crypto.getRandomValues(new Uint8Array(5));
+  return "RPC-" + Array.from(bytes, (b) => letras[b % letras.length]).join("");
 }
 
 /** Agrega la referencia al texto del link de WhatsApp (o lo crea si el link no traía mensaje). */
-export function linkWhatsAppConReferencia(href: string, o: OrigenVisita | null): string {
+export function linkWhatsAppConReferencia(href: string, o: OrigenVisita | null, codigo?: string): string {
   try {
     const url = new URL(href);
     const texto = url.searchParams.get("text") ?? "Hola, quiero cotizar.";
     if (/\(Ref\. web/.test(texto)) return href;
-    url.searchParams.set("text", `${texto}\n\n${referenciaWhatsApp(o)}`);
+    url.searchParams.set("text", `${texto}\n\n${referenciaWhatsApp(o, codigo)}`);
     return url.toString();
   } catch { return href; }
 }

@@ -61,3 +61,30 @@ export async function registrarSolicitudEnOs(s: SolicitudSitio): Promise<void> {
     console.error("[crm-os]", s.numero, e instanceof Error ? e.message : "error");
   }
 }
+
+/**
+ * Clic al WhatsApp con su código (18-11-2026): el CRM guarda el código con el
+ * clic del anuncio de la cookie, sin crear tarjeta. Cuando Maca pone el código
+ * en su cotizador, la tarjeta queda amarrada a ese clic y a su campaña.
+ */
+export async function registrarClicWhatsAppEnOs(ref: string): Promise<void> {
+  const url = process.env.RPC_OS_URL?.trim();
+  const secreto = process.env.RPC_OS_SECRETO?.trim();
+  if (!url || !secreto || !/^RPC-[A-Z0-9]{4,6}$/.test(ref)) return;
+  try {
+    const origen = leerOrigen((await cookies()).get(COOKIE_ORIGEN)?.value);
+    const cuerpo = JSON.stringify({ evento: "clic_whatsapp", ref, canal: canalDeOrigen(origen), origen });
+    const t = String(Date.now());
+    const huella = createHash("sha256").update(cuerpo).digest("hex");
+    const v1 = createHmac("sha256", secreto).update(`rovle-cotizacion\n${t}\n${huella}`).digest("hex");
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Rovle-Firma": `t=${t},v1=${v1}` },
+      body: cuerpo,
+      signal: AbortSignal.timeout(8_000),
+    });
+    if (!res.ok) console.error("[crm-os] whatsapp", ref, res.status);
+  } catch (e) {
+    console.error("[crm-os] whatsapp", ref, e instanceof Error ? e.message : "error");
+  }
+}
