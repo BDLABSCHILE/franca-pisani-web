@@ -358,7 +358,7 @@ export async function submitQuoteAction(
     };
   }
 
-  // 4b. Al CRM de la plataforma como Lead, con el anuncio que trajo la visita.
+  // 4b. Al CRM de la plataforma en Cotizado (con el PDF), con el anuncio que trajo la visita.
   //     Nunca bota la cotización: si falla, queda en el log.
   await registrarSolicitudEnOs({
     tipo: "Solicitud web",
@@ -368,6 +368,8 @@ export async function submitQuoteAction(
     contacto: { nombre: data.contactName, correo: data.contactEmail, telefono: data.contactPhone },
     montoNeto: lines.reduce((suma, l) => suma + l.pricing.subtotalNet, 0),
     detalle: lines.map((l) => `${l.quantity} × ${l.productTitle} (${l.techniqueLabel})`).join(" · "),
+    etapa: "cotizado",
+    pdf: pdfBuffer,
   });
 
   // 5. Enviar emails (o dry-run si no hay credenciales).
