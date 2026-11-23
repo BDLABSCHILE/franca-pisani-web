@@ -112,5 +112,7 @@ export function canalDeOrigen(o: OrigenVisita | null): string {
   const fuente = (o.utmSource ?? "").toLowerCase();
   if (o.gclid || o.gbraid || o.wbraid || (fuente === "google" && /cpc|ppc|paid/i.test(o.utmMedium ?? ""))) return "Google Ads";
   if (o.fbclid || ["facebook", "fb", "instagram", "ig", "meta"].includes(fuente)) return "Meta Ads";
+  // ChatGPT Ads solo con medio pagado: sus citas orgánicas traen utm_source=chatgpt.com sin medio.
+  if (["chatgpt", "chatgpt.com", "openai"].includes(fuente) && /cpc|ppc|paid/i.test(o.utmMedium ?? "")) return "ChatGPT Ads";
   return "Web / formulario";
 }
