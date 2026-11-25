@@ -47,6 +47,10 @@ anuncios. El 24-11 se invitó a contacto.bdlabs@gmail.com.
 
 - [x] Cuenta creada por el cliente e invitación a contacto.bdlabs@gmail.com
 - [ ] Aceptar la invitación (Benja: entrar con contacto.bdlabs@gmail.com)
-- [ ] Definir de qué canal salen los $100.000 (Benja)
+- [x] Definir de qué canal salen los $100.000: **Google** (Benja, 25-11, «haz todo tú»).
+      Google usaba ~75 % de su presupuesto. El ajuste se hace el MISMO día que
+      se activa ChatGPT: bajar el diario de Google en ≈$3.300 (o lo que quede
+      de diario en ChatGPT), para que el total del mes no cambie. Antes de eso
+      no se toca: bajar Google sin ChatGPT andando solo deja de invertir.
 - [ ] Cargar campaña y anuncios, y revisar que OpenAI los apruebe
 - [ ] Instalar el píxel de OpenAI en el sitio
