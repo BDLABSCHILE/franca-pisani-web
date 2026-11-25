@@ -43,10 +43,11 @@ anuncios. El 24-11 se invitó a contacto.bdlabs@gmail.com.
 - Píxel de OpenAI: falta. Se instala en el sitio cuando la cuenta entregue el
   ID, y recién ahí se pasa el objetivo a conversiones.
 
-## Estado al 24-11
+## Estado al 25-11
 
 - [x] Cuenta creada por el cliente e invitación a contacto.bdlabs@gmail.com
-- [ ] Aceptar la invitación (Benja: entrar con contacto.bdlabs@gmail.com)
+- [x] Invitación aceptada por Benja (25-11) con contacto.bdlabs@gmail.com
+- [x] Canal «ChatGPT Ads» creado APAGADO en la plataforma de RP (plataforma `openai`, $100.000/mes, id 26f7c9e0): se enciende el día que la campaña salga
 - [x] Definir de qué canal salen los $100.000: **Google** (Benja, 25-11, «haz todo tú»).
       Google usaba ~75 % de su presupuesto. El ajuste se hace el MISMO día que
       se activa ChatGPT: bajar el diario de Google en ≈$3.300 (o lo que quede
