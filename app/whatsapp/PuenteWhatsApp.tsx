@@ -13,13 +13,29 @@ export function PuenteWhatsApp() {
   useEffect(() => {
     // Primero la cookie del clic (los efectos del layout corren después que los de la página).
     guardarOrigenDeLaVisita();
-    const codigo = nuevoCodigoWhatsApp();
+    /*
+     * ⚠️ 26-11-2026: al cambiar los anuncios a esta página, el revisor de Meta la
+     * abrió ~190 veces en 25 min (incluso desde anuncios PAUSADOS): cada visita
+     * creaba un código y un «Lead» falso que Meta usa para optimizar. Un clic
+     * real de un anuncio de Meta llega en el navegador de Instagram o Facebook;
+     * un robot no. Solo se cuenta a quien sí parece persona.
+     */
+    const ua = navigator.userAgent;
+    const params = new URLSearchParams(location.search);
+    const desdeMeta = params.has("fbclid") || /^(meta|fb|facebook|ig|instagram)$/i.test(params.get("utm_source") ?? "");
+    const enAppMeta = /Instagram|FBAN|FBAV|FB_IAB|FBIOS|Messenger/i.test(ua);
+    const robot = navigator.webdriver || /bot|crawl|spider|facebookexternalhit|facebookcatalog|Headless|Lighthouse|Preview/i.test(ua);
+    const contar = !robot && (!desdeMeta || enAppMeta);
+    const codigo = contar ? nuevoCodigoWhatsApp() : undefined;
     const destino = linkWhatsAppConReferencia(CONTACT_LINKS.whatsappWithMessage(MENSAJE), origenGuardado(), codigo);
     setLink(destino);
-    try {
-      navigator.sendBeacon("/api/whatsapp-ref", new Blob([JSON.stringify({ ref: codigo })], { type: "application/json" }));
-    } catch { /* la medición nunca frena el WhatsApp */ }
-    medir("whatsapp_anuncio", { id: codigo, origen: "/whatsapp" });
+    if (codigo) {
+      try {
+        navigator.sendBeacon("/api/whatsapp-ref", new Blob([JSON.stringify({ ref: codigo })], { type: "application/json" }));
+      } catch { /* la medición nunca frena el WhatsApp */ }
+      medir("whatsapp_anuncio", { id: codigo, origen: "/whatsapp" });
+    }
+    if (robot) return;
     // Un respiro para que salgan el píxel y el registro, y al chat.
     const t = window.setTimeout(() => { window.location.href = destino; }, 700);
     return () => window.clearTimeout(t);
