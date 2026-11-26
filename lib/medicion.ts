@@ -9,7 +9,7 @@
  * Sin IDs no se carga nada externo: los eventos quedan solo en el dataLayer.
  */
 
-export type EventoMedido = "cotizacion_enviada" | "contacto_enviado" | "clic_whatsapp" | "clic_correo";
+export type EventoMedido = "cotizacion_enviada" | "contacto_enviado" | "clic_whatsapp" | "clic_correo" | "whatsapp_anuncio";
 
 export const GOOGLE_ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID ?? "";
 export const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "";
@@ -20,6 +20,7 @@ const ETIQUETAS_ADS: Record<EventoMedido, string> = {
   contacto_enviado: process.env.NEXT_PUBLIC_ADS_ETIQUETA_CONTACTO ?? "",
   clic_whatsapp: process.env.NEXT_PUBLIC_ADS_ETIQUETA_WHATSAPP ?? "",
   clic_correo: process.env.NEXT_PUBLIC_ADS_ETIQUETA_CORREO ?? "",
+  whatsapp_anuncio: process.env.NEXT_PUBLIC_ADS_ETIQUETA_WHATSAPP ?? "",
 };
 
 /** Las dos que de verdad son una cotización pedida; los clics son intención, no lead. */
@@ -28,6 +29,8 @@ const EVENTO_META: Record<EventoMedido, string> = {
   contacto_enviado: "Lead",
   clic_whatsapp: "Contact",
   clic_correo: "Contact",
+  // Puente /whatsapp de los anuncios de Leads (26-11-2026): abrir el chat con Maca ES el lead.
+  whatsapp_anuncio: "Lead",
 };
 
 type Ventana = Window & {
