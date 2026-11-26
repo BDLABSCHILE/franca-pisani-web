@@ -5,7 +5,7 @@ import { CONTACT_LINKS } from "@/lib/brand/contacts";
 import { medir } from "@/lib/medicion";
 import { guardarOrigenDeLaVisita, linkWhatsAppConReferencia, nuevoCodigoWhatsApp, origenGuardado } from "@/lib/origen-visita";
 
-const MENSAJE = "Hola, vengo del anuncio y quiero cotizar 👋";
+const MENSAJE = "Hola, vengo del anuncio y quiero cotizar";
 
 export function PuenteWhatsApp() {
   const [link, setLink] = useState(CONTACT_LINKS.whatsappWithMessage(MENSAJE));
