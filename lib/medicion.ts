@@ -39,16 +39,36 @@ type Ventana = Window & {
   fbq?: (...args: unknown[]) => void;
 };
 
-/** `id` evita contar dos veces la misma cotización (Google la deduplica por transaction_id). */
-export function medir(evento: EventoMedido, datos: { id?: string; origen?: string } = {}): void {
-  if (typeof window === "undefined") return;
+/**
+ * `id` evita contar dos veces la misma cotización (Google la deduplica por transaction_id).
+ *
+ * ⚠️ 27-11-2026: el píxel de Meta y gtag cargan «afterInteractive», DESPUÉS de
+ * los efectos de la página. Un `medir` que corre al cargar (el puente /whatsapp)
+ * encontraba `fbq` sin definir y el Lead se perdía en silencio: 40 aperturas, 0
+ * leads en Meta, la campaña optimizando a ciegas. Ahora espera hasta 3 s a que
+ * estén y resuelve cuando ya se enviaron (o cuando se rindió).
+ */
+export function medir(evento: EventoMedido, datos: { id?: string; origen?: string } = {}): Promise<void> {
+  if (typeof window === "undefined") return Promise.resolve();
   const w = window as Ventana;
   (w.dataLayer ||= []).push({ event: evento, ...datos });
   const etiqueta = ETIQUETAS_ADS[evento];
-  if (GOOGLE_ADS_ID && etiqueta && w.gtag) {
-    w.gtag("event", "conversion", { send_to: `${GOOGLE_ADS_ID}/${etiqueta}`, ...(datos.id ? { transaction_id: datos.id } : {}) });
-  }
-  if (META_PIXEL_ID && w.fbq) {
-    w.fbq("track", EVENTO_META[evento], { content_name: evento }, datos.id ? { eventID: datos.id } : undefined);
-  }
+  let google = !(GOOGLE_ADS_ID && etiqueta);
+  let meta = !META_PIXEL_ID;
+  return new Promise((listo) => {
+    const inicio = Date.now();
+    const intentar = () => {
+      if (!google && w.gtag) {
+        w.gtag("event", "conversion", { send_to: `${GOOGLE_ADS_ID}/${etiqueta}`, ...(datos.id ? { transaction_id: datos.id } : {}) });
+        google = true;
+      }
+      if (!meta && w.fbq) {
+        w.fbq("track", EVENTO_META[evento], { content_name: evento }, datos.id ? { eventID: datos.id } : undefined);
+        meta = true;
+      }
+      if ((google && meta) || Date.now() - inicio > 3000) return listo();
+      window.setTimeout(intentar, 100);
+    };
+    intentar();
+  });
 }

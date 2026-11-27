@@ -53,10 +53,10 @@ export function PuenteWhatsApp() {
         try {
           navigator.sendBeacon("/api/whatsapp-ref", new Blob([JSON.stringify({ ref: codigo })], { type: "application/json" }));
         } catch { /* la medición nunca frena el WhatsApp */ }
-        medir("whatsapp_anuncio", { id: codigo, origen: "/whatsapp" });
       }
-      // Un respiro para que salgan el píxel y el registro, y al chat.
-      t = window.setTimeout(() => { window.location.href = destino; }, 700);
+      // Primero que el píxel reciba el Lead (espera a que cargue), después un respiro y al chat.
+      const medido = nuevo && codigo ? medir("whatsapp_anuncio", { id: codigo, origen: "/whatsapp" }) : Promise.resolve();
+      void medido.then(() => { t = window.setTimeout(() => { window.location.href = destino; }, 400); });
     };
     arrancar();
     document.addEventListener("visibilitychange", arrancar);
