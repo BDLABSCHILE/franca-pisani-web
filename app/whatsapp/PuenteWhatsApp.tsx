@@ -26,19 +26,46 @@ export function PuenteWhatsApp() {
     const enAppMeta = /Instagram|FBAN|FBAV|FB_IAB|FBIOS|Messenger/i.test(ua);
     const robot = navigator.webdriver || /bot|crawl|spider|facebookexternalhit|facebookcatalog|Headless|Lighthouse|Preview/i.test(ua);
     const contar = !robot && (!desdeMeta || enAppMeta);
-    const codigo = contar ? nuevoCodigoWhatsApp() : undefined;
-    const destino = linkWhatsAppConReferencia(CONTACT_LINKS.whatsappWithMessage(MENSAJE), origenGuardado(), codigo);
-    setLink(destino);
-    if (codigo) {
-      try {
-        navigator.sendBeacon("/api/whatsapp-ref", new Blob([JSON.stringify({ ref: codigo })], { type: "application/json" }));
-      } catch { /* la medición nunca frena el WhatsApp */ }
-      medir("whatsapp_anuncio", { id: codigo, origen: "/whatsapp" });
-    }
     if (robot) return;
-    // Un respiro para que salgan el píxel y el registro, y al chat.
-    const t = window.setTimeout(() => { window.location.href = destino; }, 700);
-    return () => window.clearTimeout(t);
+
+    /*
+     * 27-11-2026: Instagram precarga la página antes de que la persona toque el
+     * anuncio (ráfagas de 6 registros en el mismo minuto, nadie escribiendo).
+     * Se cuenta y se abre WhatsApp SOLO cuando la página está de verdad en
+     * pantalla, y una sola vez por pestaña.
+     */
+    let hecho = false;
+    let t: number | undefined;
+    const arrancar = () => {
+      const doc = document as Document & { prerendering?: boolean };
+      if (hecho || doc.prerendering || document.visibilityState !== "visible") return;
+      hecho = true;
+      let codigo: string | undefined;
+      try { codigo = sessionStorage.getItem("rpc_wa_codigo") ?? undefined; } catch { /* sin storage */ }
+      const nuevo = contar && !codigo;
+      if (nuevo) {
+        codigo = nuevoCodigoWhatsApp();
+        try { sessionStorage.setItem("rpc_wa_codigo", codigo); } catch { /* sin storage */ }
+      }
+      const destino = linkWhatsAppConReferencia(CONTACT_LINKS.whatsappWithMessage(MENSAJE), origenGuardado(), contar ? codigo : undefined);
+      setLink(destino);
+      if (nuevo && codigo) {
+        try {
+          navigator.sendBeacon("/api/whatsapp-ref", new Blob([JSON.stringify({ ref: codigo })], { type: "application/json" }));
+        } catch { /* la medición nunca frena el WhatsApp */ }
+        medir("whatsapp_anuncio", { id: codigo, origen: "/whatsapp" });
+      }
+      // Un respiro para que salgan el píxel y el registro, y al chat.
+      t = window.setTimeout(() => { window.location.href = destino; }, 700);
+    };
+    arrancar();
+    document.addEventListener("visibilitychange", arrancar);
+    document.addEventListener("prerenderingchange", arrancar);
+    return () => {
+      document.removeEventListener("visibilitychange", arrancar);
+      document.removeEventListener("prerenderingchange", arrancar);
+      if (t) window.clearTimeout(t);
+    };
   }, []);
 
   return (
