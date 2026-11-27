@@ -16,7 +16,7 @@ import { canalDeOrigen, COOKIE_ORIGEN, leerOrigen } from "./origen-visita";
  * y el formulario funciona igual: la medición nunca bota un lead.
  */
 export type SolicitudSitio = {
-  tipo: "Solicitud web" | "Contacto web";
+  tipo: "Solicitud web" | "Contacto web" | "Formulario anuncio";
   numero: string;
   empresa: string;
   rut?: string;
